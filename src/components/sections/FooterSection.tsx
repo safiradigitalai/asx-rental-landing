@@ -367,23 +367,20 @@ export default function FooterSection() {
         {/* Editorial Bottom Bar */}
         <motion.footer 
           className="magazine-grid border-t border-white/10"
-          style={{ paddingTop: 'var(--space-8)' }}
+          style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.8 }}
           transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
         >
           <div className="col-span-12">
-            <div className="flex flex-col lg:flex-row items-center justify-between" style={{ gap: 'var(--space-6)' }}>
+            <div className="flex flex-col lg:flex-row items-center justify-between" style={{ gap: 'var(--space-4)' }}>
               <div className="text-white/60 text-sm font-light">
                 © {currentYear} ASX Group Rental Cars. Todos os direitos reservados.
               </div>
               
-              <div className="flex items-center text-white/60 text-sm font-light" style={{ gap: 'var(--space-2)' }}>
-                <span>Desenvolvido com</span>
-                <Heart className="w-4 h-4 text-amber-400 animate-pulse" />
-                <span>pela</span>
-                <span className="text-amber-400 font-semibold">Safira Digital</span>
+              <div className="text-white/60 text-sm font-light">
+                by: <span className="text-amber-400 font-semibold">Safira Digital</span>
               </div>
             </div>
           </div>
