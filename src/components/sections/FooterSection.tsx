@@ -319,7 +319,7 @@ export default function FooterSection() {
               <div className="absolute inset-0 bg-white/5 backdrop-blur-md border border-white/15" />
               
               <div className="relative z-10 text-white" style={{ padding: 'var(--space-6)' }}>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
                   <h4 className="text-amber-400 font-semibold text-sm tracking-[0.2em] uppercase">
                     Conecte-se
                   </h4>
@@ -327,7 +327,7 @@ export default function FooterSection() {
                 </div>
                 
                 {/* Social Links */}
-                <div className="flex items-center mb-6" style={{ gap: 'var(--space-3)' }}>
+                <div className="flex items-center" style={{ gap: 'var(--space-3)', marginBottom: 'var(--space-1)' }}>
                   {[
                     { icon: Facebook, color: 'hover:text-blue-400' },
                     { icon: Instagram, color: 'hover:text-pink-400' },
@@ -346,12 +346,13 @@ export default function FooterSection() {
                 </div>
 
                 {/* Legal Links */}
-                <div className="space-y-2">
+                <div className="text-right" style={{ marginTop: 'var(--space-1)' }}>
                   {['Política de Privacidade', 'Termos de Uso'].map((link, index) => (
                     <motion.button
                       key={index}
-                      className="text-white/50 hover:text-amber-300 transition-colors duration-300 text-xs block"
-                      whileHover={{ x: 2 }}
+                      className="text-white/50 hover:text-amber-300 transition-colors duration-300 text-xs block w-full text-right"
+                      style={{ marginBottom: index === 0 ? 'var(--space-1)' : '0' }}
+                      whileHover={{ x: -2 }}
                       onClick={() => scrollToSection('#')}
                     >
                       {link}
