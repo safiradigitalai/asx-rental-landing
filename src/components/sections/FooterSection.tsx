@@ -279,11 +279,12 @@ export default function FooterSection() {
                     <motion.div
                       key={columnIndex}
                       className="editorial-stack"
+                      style={{ marginBottom: columnIndex === 0 ? 'var(--space-2)' : '0' }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: 0.8 + (columnIndex * 0.15) }}
                     >
-                      <h4 className={`text-amber-400 font-semibold text-sm tracking-wide uppercase mb-3 ${columnIndex === 1 ? 'mt-[var(--space-2)]' : ''}`}>
+                      <h4 className="text-amber-400 font-semibold text-sm tracking-wide uppercase mb-3">
                         {column.section}
                       </h4>
                       <ul className="space-y-2">
