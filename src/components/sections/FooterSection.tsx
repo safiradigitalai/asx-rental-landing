@@ -267,10 +267,6 @@ export default function FooterSection() {
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <div className="border-l-4 border-amber-400/60 editorial-stack-lg" style={{ paddingLeft: 'var(--space-6)' }}>
-                <h3 className="text-2xl font-bold text-white leading-none mb-6">
-                  Navegação Rápida
-                </h3>
-                
                 <div className="space-y-6">
                   {[
                     { section: 'Serviços', links: ['Aluguel de Carros', 'Calculadora', 'Depoimentos'] },
