@@ -283,7 +283,7 @@ export default function FooterSection() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: 0.8 + (columnIndex * 0.15) }}
                     >
-                      <h4 className="text-amber-400 font-semibold text-sm tracking-wide uppercase mb-3">
+                      <h4 className={`text-amber-400 font-semibold text-sm tracking-wide uppercase mb-3 ${columnIndex === 1 ? 'mt-[var(--space-2)]' : ''}`}>
                         {column.section}
                       </h4>
                       <ul className="space-y-2">
