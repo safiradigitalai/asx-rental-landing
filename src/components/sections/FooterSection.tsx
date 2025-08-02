@@ -283,20 +283,20 @@ export default function FooterSection() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: 0.8 + (columnIndex * 0.15) }}
                     >
-                      <h4 className="text-amber-400 font-semibold text-sm tracking-wide uppercase mb-3">
+                      <h4 className="text-amber-400 font-semibold text-sm tracking-wide uppercase mb-3 text-right">
                         {column.section}
                       </h4>
-                      <ul className="space-y-2">
+                      <ul className="space-y-2 text-right">
                         {column.links.map((link, linkIndex) => (
                           <motion.li key={linkIndex}>
                             <motion.button
-                              className="group flex items-center text-white/70 hover:text-amber-300 transition-all duration-300 text-sm"
+                              className="group flex items-center justify-end text-white/70 hover:text-amber-300 transition-all duration-300 text-sm w-full"
                               style={{ gap: 'var(--space-2)' }}
-                              whileHover={{ x: 4 }}
+                              whileHover={{ x: -4 }}
                               onClick={() => scrollToSection('#categorias')}
                             >
-                              <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                               <span>{link}</span>
+                              <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             </motion.button>
                           </motion.li>
                         ))}
@@ -319,7 +319,7 @@ export default function FooterSection() {
               <div className="absolute inset-0 bg-white/5 backdrop-blur-md border border-white/15" />
               
               <div className="relative z-10 text-white" style={{ padding: 'var(--space-6)' }}>
-                <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-4)' }}>
+                <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-2)' }}>
                   <h4 className="text-amber-400 font-semibold text-sm tracking-[0.2em] uppercase">
                     Conecte-se
                   </h4>
@@ -346,13 +346,12 @@ export default function FooterSection() {
                 </div>
 
                 {/* Legal Links */}
-                <div className="text-right" style={{ marginTop: 'var(--space-1)' }}>
+                <div className="space-y-2">
                   {['Política de Privacidade', 'Termos de Uso'].map((link, index) => (
                     <motion.button
                       key={index}
-                      className="text-white/50 hover:text-amber-300 transition-colors duration-300 text-xs block w-full text-right"
-                      style={{ marginBottom: index === 0 ? 'var(--space-1)' : '0' }}
-                      whileHover={{ x: -2 }}
+                      className="text-white/50 hover:text-amber-300 transition-colors duration-300 text-xs block"
+                      whileHover={{ x: 2 }}
                       onClick={() => scrollToSection('#')}
                     >
                       {link}
