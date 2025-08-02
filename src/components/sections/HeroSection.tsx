@@ -68,31 +68,19 @@ export default function HeroSection() {
           <div className="flex items-center justify-between">
             <Logo size="lg" variant="light" />
             
-            <div className="flex items-center" style={{ gap: 'var(--space-6)' }}>
-              <motion.div 
-                className="hidden lg:flex items-center bg-white/5 backdrop-blur-md border border-white/10 text-white/90 text-sm font-medium tracking-wide" 
-                style={{ gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-4)' }}
-                whileHover={{ 
-                  scale: 1.02, 
-                  backgroundColor: 'rgba(255,255,255,0.08)',
-                  borderColor: 'rgba(255,255,255,0.2)' 
-                }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-              >
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <span>Atendimento Online</span>
-              </motion.div>
-              
-              <motion.button
-                className="hidden md:flex items-center bg-white/8 backdrop-blur-md border border-white/15 text-white hover:bg-white/15 hover:border-white/25 transition-all duration-400 font-medium tracking-wide cursor-pointer"
-                style={{ gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-5)' }}
-                whileHover={{ scale: 1.02, y: -1 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Play className="w-4 h-4" />
-                <span>Tour Virtual</span>
-              </motion.button>
-            </div>
+            <motion.button
+              className="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs sm:text-sm tracking-[0.1em] uppercase transition-all duration-400 flex items-center cursor-pointer rounded-md"
+              style={{ 
+                padding: 'var(--space-2) var(--space-3)',
+                gap: 'var(--space-2)'
+              }}
+              onClick={() => scrollToSection('calculadora')}
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="hidden sm:inline">Faça sua Reserva</span>
+              <span className="sm:hidden">Reservar</span>
+            </motion.button>
           </div>
         </div>
       </motion.nav>
@@ -100,12 +88,12 @@ export default function HeroSection() {
       {/* Editorial Main Content */}
       <div className="relative z-40 min-h-screen flex items-center" style={{ paddingTop: 'var(--space-20)', paddingBottom: 'var(--space-20)' }}>
         <div className="editorial-container">
-          <div className="magazine-grid align-center">
-            {/* Left Column - Editorial Headlines */}
-            <div className="col-span-12 lg:col-span-7 editorial-stack-lg editorial-rhythm">
-              {/* Issue Header */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Main Content - Full width on mobile, 7 cols on desktop */}
+            <div className="lg:col-span-7 editorial-stack-lg editorial-rhythm">
+              {/* Issue Header - Hidden on Mobile */}
               <motion.header
-                className="flex items-center"
+                className="hidden lg:flex items-center"
                 style={{ gap: 'var(--space-6)', marginBottom: 'var(--space-8)' }}
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -128,7 +116,7 @@ export default function HeroSection() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.4, ease: [0.6, -0.05, 0.01, 0.99] }}
               >
-                <h1 className="text-editorial-xl text-white tracking-tighter">
+                <h1 className="text-editorial-md sm:text-editorial-lg lg:text-editorial-xl text-white tracking-tighter">
                   ALUGUE
                   <br />
                   <span className="text-transparent bg-gradient-to-r from-amber-400 via-amber-300 to-amber-200 bg-clip-text">
@@ -233,8 +221,8 @@ export default function HeroSection() {
               </motion.section>
             </div>
 
-            {/* Right Column - Stats & Social Proof */}
-            <div className="col-span-12 lg:col-span-5 editorial-stack-lg" style={{ paddingLeft: 'var(--space-8)' }}>
+            {/* Right Column - Stats & Social Proof - Hidden on Mobile */}
+            <div className="hidden lg:block lg:col-span-5 editorial-stack-lg" style={{ paddingLeft: 'var(--space-8)' }}>
               {/* Statistics Section */}
               <motion.section
                 className="editorial-stack-lg"
@@ -242,7 +230,7 @@ export default function HeroSection() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <div className="border-l-4 border-amber-400/60 editorial-stack-lg" style={{ paddingLeft: 'var(--space-6)' }}>
+                <div className="border-l-4 border-amber-400/60" style={{ paddingLeft: 'var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
                   {[
                     { number: "10,000+", label: "Clientes Satisfeitos", description: "Brasileiros atendidos" },
                     { number: "50+", label: "Modelos Disponíveis", description: "Frota premium" },
@@ -250,7 +238,7 @@ export default function HeroSection() {
                   ].map((stat, index) => (
                     <motion.div
                       key={index}
-                      className="editorial-stack-sm"
+                      style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: 0.8 + (index * 0.15) }}

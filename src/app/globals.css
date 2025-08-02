@@ -45,7 +45,7 @@
   --shadow-deep: 0 20px 40px rgba(0, 0, 0, 0.3);
   --shadow-ambient: 0 2px 10px rgba(0, 0, 0, 0.1);
   
-  /* Editorial Typography Scale */
+  /* Editorial Typography Scale - Desktop */
   --text-editorial-xl: 9rem;
   --text-editorial-lg: 6rem;
   --text-editorial-md: 4rem;
@@ -273,6 +273,38 @@ body {
   --space-12: calc(var(--baseline) * 6); /* 144px */
   --space-16: calc(var(--baseline) * 8); /* 192px */
   --space-20: calc(var(--baseline) * 10); /* 240px */
+}
+
+/* Responsive Editorial System - Tablet */
+@media (max-width: 1024px) {
+  :root {
+    /* Typography Scale - Tablet (75% of desktop) */
+    --text-editorial-xl: 6.75rem;  /* 108px */
+    --text-editorial-lg: 4.5rem;   /* 72px */
+    --text-editorial-md: 3rem;     /* 48px */
+    --text-editorial-sm: 1.875rem; /* 30px */
+    
+    /* Spacing Scale - Tablet (80% baseline) */
+    --baseline: 1.2rem; /* 19.2px */
+    --space-12: calc(var(--baseline) * 5); /* 96px instead of 144px */
+    --space-16: calc(var(--baseline) * 6.5); /* 124px instead of 192px */
+  }
+}
+
+/* Responsive Editorial System - Mobile */
+@media (max-width: 768px) {
+  :root {
+    /* Typography Scale - Mobile (50% of desktop) */
+    --text-editorial-xl: 4.5rem;   /* 72px */
+    --text-editorial-lg: 3rem;     /* 48px */
+    --text-editorial-md: 2rem;     /* 32px */
+    --text-editorial-sm: 1.25rem;  /* 20px */
+    
+    /* Spacing Scale - Mobile (60% baseline) */
+    --baseline: 0.9rem; /* 14.4px */
+    --space-12: calc(var(--baseline) * 4); /* 57.6px instead of 144px */
+    --space-16: calc(var(--baseline) * 5); /* 72px instead of 192px */
+  }
 }
 
 /* Editorial Layout Utilities */

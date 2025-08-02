@@ -20,28 +20,16 @@ interface VehicleCategory {
 export default function VehicleCategoriesSection() {
   const categories: VehicleCategory[] = [
     {
-      id: 'sedan',
-      name: 'Sedan',
-      model: 'Hyundai Elantra',
+      id: 'esportivo',
+      name: 'Esportivo',
+      model: 'Dodge Challenger',
       year: 2020,
-      color: 'Azul',
-      passengers: 5,
-      priceRange: '$45-65/dia',
-      dailyPrice: 44.99,
-      imageUrl: 'https://images.unsplash.com/photo-1550355191-aa8a80b41353?q=80&w=2340&auto=format&fit=crop',
-      features: ['Econômico', 'Ar Condicionado', 'Direção Elétrica', 'Bluetooth']
-    },
-    {
-      id: 'minivan-regular',
-      name: 'Minivan Regular',
-      model: 'Dodge Grand Caravan',
-      year: 2020,
-      color: 'Branca/Preta',
-      passengers: 7,
-      priceRange: '$65-85/dia',
-      dailyPrice: 54.99,
-      imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=2340&auto=format&fit=crop',
-      features: ['7 Lugares', 'Porta Traseira Automática', 'Espaço Bagagem', 'GPS']
+      color: 'Laranja',
+      passengers: 2,
+      priceRange: '$95-140/dia',
+      dailyPrice: 49.99,
+      imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2340&auto=format&fit=crop',
+      features: ['Motor V6', 'Esportivo', 'Som Premium', 'Performance']
     },
     {
       id: 'minivan-luxo',
@@ -56,6 +44,30 @@ export default function VehicleCategoriesSection() {
       features: ['8 Lugares', 'Couro', 'Tela Touchscreen', 'Câmera de Ré']
     },
     {
+      id: 'minivan-regular',
+      name: 'Minivan Regular',
+      model: 'Dodge Grand Caravan',
+      year: 2020,
+      color: 'Branca/Preta',
+      passengers: 7,
+      priceRange: '$65-85/dia',
+      dailyPrice: 54.99,
+      imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=2340&auto=format&fit=crop',
+      features: ['7 Lugares', 'Porta Traseira Automática', 'Espaço Bagagem', 'GPS']
+    },
+    {
+      id: 'sedan',
+      name: 'Sedan',
+      model: 'Hyundai Elantra',
+      year: 2020,
+      color: 'Azul',
+      passengers: 5,
+      priceRange: '$45-65/dia',
+      dailyPrice: 44.99,
+      imageUrl: 'https://images.unsplash.com/photo-1550355191-aa8a80b41353?q=80&w=2340&auto=format&fit=crop',
+      features: ['Econômico', 'Ar Condicionado', 'Direção Elétrica', 'Bluetooth']
+    },
+    {
       id: 'suv',
       name: 'SUV',
       model: 'Chevrolet Equinox',
@@ -66,18 +78,6 @@ export default function VehicleCategoriesSection() {
       dailyPrice: 54.99,
       imageUrl: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=2340&auto=format&fit=crop',
       features: ['AWD', 'Porta-Bagagem Elétrica', 'Sensores', 'Apple CarPlay']
-    },
-    {
-      id: 'esportivo',
-      name: 'Esportivo',
-      model: 'Dodge Challenger',
-      year: 2020,
-      color: 'Laranja',
-      passengers: 2,
-      priceRange: '$95-140/dia',
-      dailyPrice: 49.99,
-      imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2340&auto=format&fit=crop',
-      features: ['Motor V6', 'Esportivo', 'Som Premium', 'Performance']
     },
     {
       id: 'suburban',
@@ -137,14 +137,15 @@ export default function VehicleCategoriesSection() {
       <div className="editorial-container relative z-10">
         {/* Editorial Header */}
         <motion.header
-          className="magazine-grid editorial-rhythm text-center"
+          className="editorial-rhythm text-center"
           style={{ marginBottom: 'var(--space-16)' }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
         >
-          <div className="col-span-12 lg:col-span-8 lg:col-start-3">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            <div className="col-span-12 lg:col-span-8 lg:col-start-3">
             {/* Issue Label */}
             <motion.div 
               className="inline-flex items-center bg-amber-500/10 border border-amber-500/20 text-amber-700 text-sm font-medium tracking-[0.2em] uppercase"
@@ -185,11 +186,12 @@ export default function VehicleCategoriesSection() {
             >
               Desde econômicos até premium. Cada veículo com seguro completo, quilometragem ilimitada e atendimento especializado em português.
             </motion.p>
+            </div>
           </div>
         </motion.header>
 
-        {/* Editorial Vehicle Grid - 2 Columns Layout */}
-        <div className="magazine-grid">
+        {/* Desktop Grid - 2 Columns Layout */}
+        <div className="hidden lg:grid lg:grid-cols-12 gap-8 lg:gap-12">
           {categories.map((category, index) => (
             <motion.article
               key={category.id}
@@ -327,16 +329,185 @@ export default function VehicleCategoriesSection() {
           ))}
         </div>
 
+        {/* Mobile Slider - Same Pattern as Desktop */}
+        <div className="lg:hidden">
+          <div className="overflow-x-auto scrollbar-hide">
+            <div className="flex" style={{ gap: 'var(--space-4)', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}>
+              {categories.map((category, index) => (
+                <motion.article
+                  key={`mobile-${category.id}`}
+                  className="relative overflow-hidden group cursor-pointer flex-shrink-0"
+                  style={{ 
+                    width: 'clamp(280px, 85vw, 320px)',
+                    height: '520px',
+                    borderRadius: '16px'
+                  }}
+                  initial={{ opacity: 0, x: 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ 
+                    duration: 0.6, 
+                    delay: index * 0.1,
+                    ease: [0.6, -0.05, 0.01, 0.99]
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleCategorySelect}
+                >
+                  {/* Clean Premium Background - Same as Desktop */}
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
+                    whileTap={{ scale: 1.02 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                  />
+
+                  {/* Subtle Animated Pattern - Same as Desktop */}
+                  <motion.div 
+                    className="absolute inset-0 opacity-[0.06]"
+                    animate={{ 
+                      backgroundPosition: ['0% 0%', '100% 100%'],
+                    }}
+                    transition={{
+                      duration: 30 + (index * 5),
+                      repeat: Infinity,
+                      ease: 'linear'
+                    }}
+                    style={{
+                      backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(212,165,116,0.4) 1px, transparent 0)',
+                      backgroundSize: 'var(--space-8) var(--space-8)'
+                    }}
+                  />
+                  
+                  {/* Elegant Gradient Overlay - Same as Desktop */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400/8 via-transparent to-amber-300/4" />
+
+                  {/* Popular Badge - Same as Desktop */}
+                  {category.popular && (
+                    <motion.div 
+                      className="absolute top-4 right-4 z-20 inline-flex items-center bg-amber-500/20 border border-amber-400/30 backdrop-blur-sm text-amber-300 text-xs font-medium tracking-[0.25em] uppercase"
+                      style={{ 
+                        gap: 'var(--space-1)', 
+                        padding: 'var(--space-2) var(--space-3)',
+                        borderRadius: '20px'
+                      }}
+                      whileHover={{ scale: 1.05, backgroundColor: 'rgba(245, 158, 11, 0.3)' }}
+                    >
+                      <Star className="w-3 h-3 fill-current" />
+                      <span>Popular</span>
+                    </motion.div>
+                  )}
+
+                  {/* Content Container - Adjusted for Mobile */}
+                  <div className="relative z-10 h-full flex flex-col text-white editorial-stack-lg" style={{ padding: 'var(--space-6)' }}>
+                    
+                    {/* Category Badge */}
+                    <motion.div 
+                      className="inline-flex items-center bg-amber-500/20 border border-amber-400/30 backdrop-blur-sm text-amber-300 text-xs font-medium tracking-[0.25em] uppercase w-fit"
+                      style={{ 
+                        gap: 'var(--space-1)', 
+                        padding: 'var(--space-2) var(--space-3)',
+                        marginBottom: 'var(--space-6)'
+                      }}
+                      whileHover={{ scale: 1.05, backgroundColor: 'rgba(245, 158, 11, 0.3)' }}
+                    >
+                      <Car className="w-3 h-3" />
+                      <span>{category.name}</span>
+                    </motion.div>
+                    
+                    {/* Vehicle Title */}
+                    <h3 className="text-headline font-bold leading-tight text-white" style={{ marginBottom: 'var(--space-4)' }}>
+                      {category.model}
+                    </h3>
+                    
+                    {/* Vehicle Details */}
+                    <div className="flex-1 editorial-stack" style={{ marginBottom: 'var(--space-6)' }}>
+                      <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-3)' }}>
+                        <div className="flex items-center text-white/80 text-sm">
+                          <Users className="w-4 h-4" style={{ marginRight: 'var(--space-1)' }} />
+                          <span>{category.passengers} pessoas</span>
+                        </div>
+                        <div className="text-amber-400 font-bold text-lg">
+                          ${category.dailyPrice}/dia
+                        </div>
+                      </div>
+                      
+                      <div className="text-white/60 text-sm">
+                        {category.color} • {category.year}
+                      </div>
+                    </div>
+                    
+                    {/* CTA Button */}
+                    <motion.div 
+                      className="flex items-center text-amber-300 font-medium text-sm cursor-pointer"
+                      style={{ gap: 'var(--space-2)' }}
+                      whileHover={{ x: 4 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                    >
+                      <span className="tracking-wide">Ver detalhes</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+          
+          {/* Mobile Slider Dots */}
+          <motion.div 
+            className="flex justify-center mt-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <div className="flex items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2" style={{ gap: 'var(--space-2)' }}>
+              {categories.map((_, index) => (
+                <motion.div
+                  key={`dot-${index}`}
+                  className="relative cursor-pointer"
+                  whileHover={{ scale: 1.3 }}
+                  whileTap={{ scale: 0.8 }}
+                >
+                  <div className="w-2 h-2 rounded-full bg-gray-400/40" />
+                  <motion.div
+                    className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{
+                      scale: index === 0 ? 1 : 0,
+                      opacity: index === 0 ? 1 : 0
+                    }}
+                    transition={{ 
+                      type: 'spring', 
+                      stiffness: 300, 
+                      damping: 20,
+                      duration: 0.3 
+                    }}
+                  />
+                  <motion.div
+                    className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400/60"
+                    initial={{ scale: 0, opacity: 0 }}
+                    whileHover={{ 
+                      scale: 1.5, 
+                      opacity: 0.6,
+                      transition: { duration: 0.2 }
+                    }}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
         {/* Editorial Call-to-Action */}
         <motion.section
-          className="magazine-grid relative"
+          className="relative"
           style={{ marginTop: 'var(--space-20)' }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: 1, ease: [0.6, -0.05, 0.01, 0.99] }}
         >
-          <div className="col-span-12 lg:col-span-10 lg:col-start-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            <div className="col-span-12 lg:col-span-10 lg:col-start-2">
             <motion.article 
               className="relative overflow-hidden text-center editorial-stack-lg group cursor-pointer"
               style={{ 
@@ -441,6 +612,7 @@ export default function VehicleCategoriesSection() {
                 </div>
               </div>
             </motion.article>
+            </div>
           </div>
         </motion.section>
       </div>

@@ -94,14 +94,15 @@ export default function DiferenciaisSection() {
       <div className="editorial-container relative z-10">
         {/* Editorial Header */}
         <motion.header
-          className="magazine-grid editorial-rhythm"
+          className="editorial-rhythm"
           style={{ marginBottom: 'var(--space-16)' }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
         >
-          <div className="col-span-12 lg:col-span-8 lg:col-start-3 text-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            <div className="col-span-12 lg:col-span-8 lg:col-start-3 text-center">
             {/* Issue Label */}
             <motion.div 
               className="inline-flex items-center bg-amber-500/10 border border-amber-500/20 text-amber-700 text-sm font-medium tracking-[0.2em] uppercase"
@@ -120,7 +121,7 @@ export default function DiferenciaisSection() {
             
             {/* Editorial Headline */}
             <motion.h2 
-              className="text-editorial-lg text-gray-900 tracking-tighter"
+              className="text-editorial-sm sm:text-editorial-md lg:text-editorial-lg text-gray-900 tracking-tighter"
               style={{ marginBottom: 'var(--space-6)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -142,11 +143,12 @@ export default function DiferenciaisSection() {
             >
               Cada detalhe foi pensado para oferecer segurança, conveniência e tranquilidade premium na sua viagem a Orlando.
             </motion.p>
+            </div>
           </div>
         </motion.header>
 
         {/* Editorial Features Layout */}
-        <div className="magazine-grid">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Featured Differential - Hero Card */}
           <motion.article
             className="col-span-12 relative overflow-hidden group cursor-pointer"
@@ -183,8 +185,9 @@ export default function DiferenciaisSection() {
             {/* Gradient Overlay for depth */}
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 via-transparent to-amber-400/10" />
             
+            {/* Desktop Layout */}
             <motion.div 
-              className="relative z-10 text-white editorial-stack-lg"
+              className="relative z-10 text-white editorial-stack-lg hidden md:block"
               style={{ padding: 'var(--space-12)' }}
               whileHover={{ y: -4 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -227,13 +230,64 @@ export default function DiferenciaisSection() {
                 <ArrowRight className="w-5 h-5" />
               </motion.div>
             </motion.div>
+
+            {/* Mobile Layout - Compact Design */}
+            <motion.div 
+              className="relative z-10 text-white md:hidden flex flex-col items-center text-center"
+              style={{ 
+                padding: 'var(--space-4) var(--space-4) var(--space-4) var(--space-4)' 
+              }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              {/* Mobile Premium Badge */}
+              <motion.div 
+                className="inline-flex items-center bg-amber-500/20 border border-amber-400/30 backdrop-blur-sm text-amber-300 text-xs font-medium tracking-[0.25em] uppercase"
+                style={{ 
+                  gap: 'var(--space-1)', 
+                  padding: 'var(--space-1) var(--space-3)',
+                  marginBottom: 'var(--space-3)'
+                }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <CreditCard className="w-3 h-3" />
+                <span>Premium</span>
+              </motion.div>
+              
+              {/* Mobile Hero Title - Simplified */}
+              <h3 className="text-2xl sm:text-3xl font-bold leading-tight" style={{ marginBottom: 'var(--space-3)' }}>
+                <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text">
+                  PAGAMENTO
+                </span>
+                <br />
+                <span className="text-white">SÓ APÓS RECEBER</span>
+              </h3>
+              
+              {/* Mobile Description - Concise */}
+              <p className="text-sm sm:text-base font-light leading-relaxed text-white/85 max-w-xs" style={{ marginBottom: 'var(--space-4)' }}>
+                Zero risco. Máxima segurança. Você só paga com as chaves na mão.
+              </p>
+              
+              {/* Mobile CTA - Touch Optimized */}
+              <motion.div 
+                className="flex items-center text-amber-300 font-medium text-sm cursor-pointer"
+                style={{ gap: 'var(--space-2)' }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              >
+                <span className="tracking-wide">Ver mais vantagens</span>
+                <ArrowRight className="w-4 h-4" />
+              </motion.div>
+            </motion.div>
           </motion.article>
 
           {/* Desktop: Premium Cards Grid / Mobile: Swipe Slider */}
           <div className="col-span-12">
             {/* Desktop Grid - First Row: 2 Large Cards */}
             <div className="hidden lg:block" style={{ marginBottom: 'var(--space-8)' }}>
-              <div className="magazine-grid">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                 {diferenciais.slice(1, 3).map((diferencial, index) => {
                   const isHighlight = diferencial.highlight;
                   return (
@@ -341,7 +395,7 @@ export default function DiferenciaisSection() {
             {/* Desktop Grid - Second Row: 2 Large Cards + 1 Full Card */}
             <div className="hidden lg:block">
               {/* First part: 2 Large Cards */}
-              <div className="magazine-grid" style={{ marginBottom: 'var(--space-8)' }}>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12" style={{ marginBottom: 'var(--space-8)' }}>
                 {diferenciais.slice(3, 5).map((diferencial, index) => {
                   const isHighlight = diferencial.highlight;
                   return (
@@ -445,7 +499,7 @@ export default function DiferenciaisSection() {
               </div>
               
               {/* Second part: 1 Full Width Card */}
-              <div className="magazine-grid">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                 {diferenciais.slice(5, 6).map((diferencial, index) => {
                   const isHighlight = diferencial.highlight;
                   return (
@@ -640,23 +694,75 @@ export default function DiferenciaisSection() {
                 })}
               </div>
             </div>
+            
+            {/* Mobile Slider Dots - Elegant Indicators */}
+            <motion.div 
+              className="lg:hidden flex justify-center"
+              style={{ marginTop: 'var(--space-6)' }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <div className="flex items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2" style={{ gap: 'var(--space-2)' }}>
+                {diferenciais.slice(1).map((_, index) => (
+                  <motion.div
+                    key={`dot-${index}`}
+                    className="relative cursor-pointer"
+                    whileHover={{ scale: 1.3 }}
+                    whileTap={{ scale: 0.8 }}
+                  >
+                    {/* Dot Background */}
+                    <div className="w-2 h-2 rounded-full bg-gray-400/40" />
+                    
+                    {/* Active Dot Indicator */}
+                    <motion.div
+                      className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{
+                        scale: index === 0 ? 1 : 0,
+                        opacity: index === 0 ? 1 : 0
+                      }}
+                      transition={{ 
+                        type: 'spring', 
+                        stiffness: 300, 
+                        damping: 20,
+                        duration: 0.3 
+                      }}
+                    />
+                    
+                    {/* Hover Glow Effect */}
+                    <motion.div
+                      className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400/60"
+                      initial={{ scale: 0, opacity: 0 }}
+                      whileHover={{ 
+                        scale: 1.5, 
+                        opacity: 0.6,
+                        transition: { duration: 0.2 }
+                      }}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </div>
         </div>
 
         {/* Editorial CTA for Categories */}
         <motion.section
-          className="magazine-grid relative"
+          className="relative"
           style={{ marginTop: 'var(--space-16)' }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
         >
-          <div className="col-span-12 lg:col-span-10 lg:col-start-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            <div className="col-span-12 lg:col-span-10 lg:col-start-2">
             <motion.article 
               className="relative overflow-hidden text-center editorial-stack-lg group cursor-pointer"
               style={{ 
-                padding: 'var(--space-10)',
+                padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-4)',
                 borderRadius: '16px'
               }}
               whileHover={{ 
@@ -694,7 +800,8 @@ export default function DiferenciaisSection() {
               {/* Gradient Overlay for depth */}
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 via-transparent to-amber-300/5" />
               
-              <div className="relative z-10 text-white">
+              {/* Desktop Layout */}
+              <div className="relative z-10 text-white hidden md:block" style={{ padding: 'var(--space-6)' }}>
                 {/* Editorial Title */}
                 <motion.h3 
                   className="text-editorial-md leading-tight" 
@@ -738,7 +845,42 @@ export default function DiferenciaisSection() {
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 </motion.div>
               </div>
+
+              {/* Mobile Layout - Compact Design */}
+              <div className="relative z-10 text-white md:hidden flex flex-col items-center text-center" style={{
+                padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-4)'
+              }}>
+                {/* Mobile Title - Simplified */}
+                <h3 className="text-2xl sm:text-3xl font-bold leading-tight" style={{ marginBottom: 'var(--space-3)' }}>
+                  <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text">
+                    NOSSA FROTA
+                  </span>
+                  <br />
+                  <span className="text-white">PREMIUM</span>
+                </h3>
+                
+                {/* Mobile Description - Concise */}
+                <p className="text-sm sm:text-base font-light leading-relaxed text-white/85 max-w-xs" style={{ marginBottom: 'var(--space-4)' }}>
+                  Econômicos até luxuosos. Seguro completo e quilometragem ilimitada.
+                </p>
+                
+                {/* Mobile CTA - Touch Optimized */}
+                <motion.div
+                  className="inline-flex items-center bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm sm:text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer"
+                  style={{ 
+                    padding: 'var(--space-3) var(--space-6)',
+                    gap: 'var(--space-2)',
+                    borderRadius: '8px'
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                >
+                  <span>Ver Veículos</span>
+                  <ArrowRight className="w-4 h-4" />
+                </motion.div>
+              </div>
             </motion.article>
+            </div>
           </div>
         </motion.section>
       </div>
