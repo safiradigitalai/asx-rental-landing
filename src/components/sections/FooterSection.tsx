@@ -29,7 +29,7 @@ export default function FooterSection() {
   };
 
   return (
-    <footer className="editorial-section bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
+    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-black relative overflow-hidden">
       {/* Editorial Background Elements */}
       <motion.div 
         className="absolute inset-0 opacity-[0.08]"
