@@ -1,8 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Users, Star, ArrowRight, Car, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { Users, Star, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { openWhatsAppMessage } from '@/lib/whatsapp';
 
 interface VehicleCategory {
   id: string;
@@ -20,7 +21,9 @@ interface VehicleCategory {
 
 export default function VehicleCategoriesSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const sliderRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   const categories: VehicleCategory[] = [
     {
@@ -102,34 +105,130 @@ export default function VehicleCategoriesSection() {
     document.getElementById('calculadora')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const nextSlide = () => {
-    const newSlide = currentSlide === categories.length - 1 ? 0 : currentSlide + 1;
-    setCurrentSlide(newSlide);
-    scrollToSlide(newSlide);
+  // Função para calcular a posição de scroll para centralizar um card
+  const getScrollPosition = (index: number) => {
+    if (!scrollRef.current) return 0;
+    
+    const cardWidth = 320; // Largura fixa dos cards
+    const gap = 24; // var(--space-6) = 24px
+    
+    // Posição do card específico no scroll
+    const cardPosition = index * (cardWidth + gap);
+    
+    // A posição de scroll necessária para centralizar o card
+    const scrollPosition = cardPosition;
+    
+    return Math.max(0, scrollPosition);
   };
 
-  const prevSlide = () => {
-    const newSlide = currentSlide === 0 ? categories.length - 1 : currentSlide - 1;
-    setCurrentSlide(newSlide);
-    scrollToSlide(newSlide);
-  };
-
+  // Navegar para um slide específico com transição suave
   const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-    scrollToSlide(index);
-  };
-
-  const scrollToSlide = (index: number) => {
-    if (sliderRef.current) {
-      const cardWidth = 320; // clamp max width
-      const gap = 16; // var(--space-4) in pixels
-      const scrollPosition = index * (cardWidth + gap);
-      sliderRef.current.scrollTo({
+    if (isScrolling || !scrollRef.current) return;
+    
+    setIsScrolling(true);
+    setIsTransitioning(true);
+    
+    // Fade out suave
+    setTimeout(() => {
+      const scrollPosition = getScrollPosition(index);
+      
+      scrollRef.current?.scrollTo({
         left: scrollPosition,
         behavior: 'smooth'
       });
-    }
+      
+      // Atualizar o estado durante a transição
+      setCurrentSlide(index);
+      
+      // Fade in após posicionamento
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 200);
+      
+    }, 100);
+    
+    // Reset scrolling flag after animation completa
+    setTimeout(() => setIsScrolling(false), 800);
   };
+
+  // Navegar para próximo/anterior
+  const goToPrevious = () => {
+    const newIndex = currentSlide > 0 ? currentSlide - 1 : categories.length - 1;
+    goToSlide(newIndex);
+  };
+
+  const goToNext = () => {
+    const newIndex = currentSlide < categories.length - 1 ? currentSlide + 1 : 0;
+    goToSlide(newIndex);
+  };
+
+  // Detectar mudança de scroll manual e manter sincronização
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (isScrolling) return; // Ignora se estivermos fazendo scroll programático
+      
+      const scrollLeft = container.scrollLeft;
+      const containerWidth = container.clientWidth;
+      const cardWidth = 320;
+      const gap = 24;
+      const padding = containerWidth / 2 - cardWidth / 2; // Padding dinâmico
+      
+      // Calcular qual card está mais próximo do centro da tela
+      const adjustedScroll = scrollLeft + padding;
+      const approximateIndex = Math.round(adjustedScroll / (cardWidth + gap));
+      const clampedIndex = Math.max(0, Math.min(approximateIndex, categories.length - 1));
+      
+      if (clampedIndex !== currentSlide) {
+        setCurrentSlide(clampedIndex);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [currentSlide, isScrolling, categories.length]);
+
+  // Garantir centralização em todas as situações
+  useEffect(() => {
+    const ensureCentered = () => {
+      if (scrollRef.current) {
+        const newPosition = getScrollPosition(currentSlide);
+        scrollRef.current.scrollLeft = newPosition;
+      }
+    };
+
+    // Tentar centralizar imediatamente
+    ensureCentered();
+    
+    // Tentar novamente após um pequeno delay (para garantir que o DOM esteja pronto)
+    const timer1 = setTimeout(ensureCentered, 50);
+    const timer2 = setTimeout(ensureCentered, 150);
+    const timer3 = setTimeout(ensureCentered, 300);
+    
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [currentSlide]); // Executa sempre que currentSlide mudar
+
+  // Reposicionar quando a tela mudar de tamanho
+  useEffect(() => {
+    const handleResize = () => {
+      if (scrollRef.current) {
+        const newPosition = getScrollPosition(currentSlide);
+        scrollRef.current.scrollLeft = newPosition;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [currentSlide]);
+
+
+
 
   return (
     <section id="categorias" className="editorial-section bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
@@ -183,7 +282,6 @@ export default function VehicleCategoriesSection() {
             <motion.div 
               className="inline-flex items-center bg-amber-500/10 border border-amber-500/20 text-amber-700 text-sm font-medium tracking-[0.2em] uppercase"
               style={{ 
-                gap: 'var(--space-2)', 
                 padding: 'var(--space-2) var(--space-4)',
                 marginBottom: 'var(--space-8)'
               }}
@@ -191,8 +289,7 @@ export default function VehicleCategoriesSection() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <Car className="w-4 h-4" />
-              <span>Frota Premium</span>
+              <span>Frota ASX</span>
             </motion.div>
             
             {/* Editorial Headline */}
@@ -302,12 +399,10 @@ export default function VehicleCategoriesSection() {
                   <div 
                     className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/30 text-amber-300 text-xs font-medium tracking-[0.2em] uppercase"
                     style={{ 
-                      gap: 'var(--space-1)', 
                       padding: 'var(--space-1) var(--space-3)',
                       borderRadius: '20px'
                     }}
                   >
-                    <Car className="w-3 h-3" />
                     <span>{category.name}</span>
                   </div>
                   
@@ -362,85 +457,84 @@ export default function VehicleCategoriesSection() {
           ))}
         </div>
 
-        {/* Mobile Slider with Navigation */}
+        {/* Mobile: Swipeable Cards */}
         <div className="lg:hidden">
-          {/* Navigation Arrows */}
-          <div className="flex items-center justify-center mb-6" style={{ gap: 'var(--space-4)' }}>
-            <motion.button
-              className="flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300 cursor-pointer"
+          {/* Cards Container */}
+          <div className="relative">
+
+            {/* Scroll Container */}
+            <motion.div 
+              ref={scrollRef}
+              className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
               style={{ 
-                width: '48px', 
-                height: '48px', 
-                borderRadius: '12px' 
+                gap: 'var(--space-6)', 
+                paddingTop: 'var(--space-4)',
+                paddingBottom: 'var(--space-4)',
+                paddingLeft: 'calc(50vw - 160px)', // Centralizar primeiro card
+                paddingRight: 'calc(50vw - 160px)'  // Centralizar último card
               }}
-              onClick={prevSlide}
-              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </motion.button>
-            
-            <div className="text-center">
-              <div className="text-sm font-medium text-gray-600 tracking-[0.1em] uppercase">
-                {String(currentSlide + 1).padStart(2, '0')} / {String(categories.length).padStart(2, '0')}
-              </div>
-              <div className="text-xs text-gray-400 mt-1">
-                {categories[currentSlide]?.name}
-              </div>
-            </div>
-            
-            <motion.button
-              className="flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300 cursor-pointer"
-              style={{ 
-                width: '48px', 
-                height: '48px', 
-                borderRadius: '12px' 
+              animate={{
+                opacity: isTransitioning ? 0.8 : 1,
               }}
-              onClick={nextSlide}
-              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
-              whileTap={{ scale: 0.95 }}
+              transition={{
+                duration: 0.3,
+                ease: [0.4, 0, 0.2, 1]
+              }}
             >
-              <ChevronRight className="w-6 h-6" />
-            </motion.button>
-          </div>
-          
-          <div className="overflow-x-auto scrollbar-hide" ref={sliderRef}>
-            <div className="flex" style={{ gap: 'var(--space-4)', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}>
               {categories.map((category, index) => (
                 <motion.article
-                  key={`mobile-${category.id}`}
-                  className="relative overflow-hidden group cursor-pointer flex-shrink-0"
+                  key={category.id}
+                  className="relative overflow-hidden group cursor-pointer flex-shrink-0 snap-center"
                   style={{ 
-                    width: 'clamp(280px, 85vw, 320px)',
-                    height: '520px',
-                    borderRadius: '16px'
+                    width: '320px', // Largura fixa para cálculos precisos
+                    height: '580px',
+                    borderRadius: '20px'
                   }}
                   initial={{ opacity: 0, x: 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ 
-                    duration: 0.6, 
-                    delay: index * 0.1,
-                    ease: [0.6, -0.05, 0.01, 0.99]
+                  animate={{ 
+                    opacity: 1, 
+                    x: 0,
+                    scale: index === currentSlide ? 1.03 : 1,
+                    y: index === currentSlide ? -4 : 0,
                   }}
-                  whileTap={{ scale: 0.98 }}
+                  transition={{ 
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    ease: [0.6, -0.05, 0.01, 0.99],
+                    scale: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+                    y: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
+                  }}
+                  whileHover={{ 
+                    y: -8,
+                    scale: 1.05,
+                    transition: { type: 'spring', stiffness: 300, damping: 20 }
+                  }}
                   onClick={handleCategorySelect}
                 >
-                  {/* Clean Premium Background - Same as Desktop */}
+                  {/* Premium Background */}
                   <motion.div 
                     className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
-                    whileTap={{ scale: 1.02 }}
-                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                    animate={{
+                      boxShadow: index === currentSlide 
+                        ? '0 20px 40px rgba(245,158,11,0.15), 0 8px 25px rgba(245,158,11,0.1)'
+                        : '0 8px 25px rgba(0,0,0,0.1)'
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      ease: 'easeOut',
+                      boxShadow: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
+                    }}
                   />
 
-                  {/* Subtle Animated Pattern - Same as Desktop */}
+                  {/* Animated Pattern */}
                   <motion.div 
                     className="absolute inset-0 opacity-[0.06]"
                     animate={{ 
                       backgroundPosition: ['0% 0%', '100% 100%'],
                     }}
                     transition={{
-                      duration: 30 + (index * 5),
+                      duration: 30 + (index * 3),
                       repeat: Infinity,
                       ease: 'linear'
                     }}
@@ -450,42 +544,46 @@ export default function VehicleCategoriesSection() {
                     }}
                   />
                   
-                  {/* Elegant Gradient Overlay - Same as Desktop */}
+                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-br from-amber-400/8 via-transparent to-amber-300/4" />
 
-                  {/* Popular Badge - Same as Desktop */}
+                  {/* Popular Badge */}
                   {category.popular && (
                     <motion.div 
-                      className="absolute top-4 right-4 z-20 inline-flex items-center bg-amber-500/20 border border-amber-400/30 backdrop-blur-sm text-amber-300 text-xs font-medium tracking-[0.25em] uppercase"
-                      style={{ 
-                        gap: 'var(--space-1)', 
+                      className="absolute top-4 right-4 z-20"
+                      style={{
+                        background: 'linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%)',
+                        color: 'white',
+                        fontSize: '10px',
+                        fontWeight: '700',
                         padding: 'var(--space-2) var(--space-3)',
-                        borderRadius: '20px'
+                        borderRadius: '16px',
+                        boxShadow: '0 6px 20px rgba(59,130,246,0.3)',
+                        letterSpacing: '0.08em',
+                        border: '1px solid rgba(255,255,255,0.2)'
                       }}
-                      whileHover={{ scale: 1.05, backgroundColor: 'rgba(245, 158, 11, 0.3)' }}
+                      initial={{ scale: 0, rotate: -10 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ delay: 0.3 + (index * 0.1), type: 'spring', stiffness: 350, damping: 20 }}
                     >
-                      <Star className="w-3 h-3 fill-current" />
-                      <span>Popular</span>
+                      ★ POPULAR
                     </motion.div>
                   )}
 
-                  {/* Editorial Content Layer - Same Pattern as Desktop */}
+                  {/* Content */}
                   <div 
                     className="relative z-10 h-full flex flex-col justify-center items-center text-white text-center"
-                    style={{ padding: 'var(--space-6)' }}
+                    style={{ padding: 'var(--space-8)' }}
                   >
-                    {/* Content Block - Centralized - Same as Desktop */}
-                    <div className="w-full" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', alignItems: 'center' }}>
-                      {/* Vehicle Category Badge */}
+                    <div className="w-full" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', alignItems: 'center' }}>
+                      {/* Category Badge */}
                       <div 
                         className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/30 text-amber-300 text-xs font-medium tracking-[0.2em] uppercase"
                         style={{ 
-                          gap: 'var(--space-1)', 
-                          padding: 'var(--space-1) var(--space-3)',
+                          padding: 'var(--space-2) var(--space-4)',
                           borderRadius: '20px'
                         }}
                       >
-                        <Car className="w-3 h-3" />
                         <span>{category.name}</span>
                       </div>
                       
@@ -495,28 +593,28 @@ export default function VehicleCategoriesSection() {
                       </h3>
                       
                       {/* Vehicle Details */}
-                      <p className="text-white/70 text-base font-light">
+                      <p className="text-white/70 text-lg font-light">
                         {category.year} • {category.color}
                       </p>
                       
                       {/* Capacity & Price */}
-                      <div className="flex items-center justify-center w-full" style={{ gap: 'var(--space-4)' }}>
-                        <div className="flex items-center text-white/60 text-sm" style={{ gap: 'var(--space-2)' }}>
-                          <Users className="w-4 h-4" />
+                      <div className="flex items-center justify-center w-full" style={{ gap: 'var(--space-6)' }}>
+                        <div className="flex items-center text-white/60 text-base" style={{ gap: 'var(--space-2)' }}>
+                          <Users className="w-5 h-5" />
                           <span>{category.passengers} pessoas</span>
                         </div>
-                        <div className="text-amber-300 font-bold text-lg">
+                        <div className="text-amber-300 font-bold text-xl">
                           ${category.dailyPrice}
-                          <span className="text-white/60 text-sm font-light">/dia</span>
+                          <span className="text-white/60 text-base font-light">/dia</span>
                         </div>
                       </div>
                       
-                      {/* Editorial Features List */}
+                      {/* Features */}
                       <div>
-                        <div className="text-white/50 text-xs font-medium tracking-[0.15em] uppercase" style={{ marginBottom: 'var(--space-1)' }}>
+                        <div className="text-white/50 text-xs font-medium tracking-[0.15em] uppercase" style={{ marginBottom: 'var(--space-2)' }}>
                           Características
                         </div>
-                        <div className="text-white/70 text-sm font-light leading-relaxed">
+                        <div className="text-white/70 text-base font-light leading-relaxed">
                           {category.features.slice(0, 3).join(' • ')}
                           {category.features.length > 3 && (
                             <span className="text-white/50"> • +{category.features.length - 3} mais</span>
@@ -524,69 +622,84 @@ export default function VehicleCategoriesSection() {
                         </div>
                       </div>
                       
-                      {/* Premium CTA */}
+                      {/* CTA */}
                       <motion.div 
-                        className="flex items-center text-amber-300 font-medium group-hover:text-white transition-colors duration-300 cursor-pointer"
-                        style={{ gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}
-                        whileHover={{ x: 4 }}
+                        className="flex items-center text-amber-300 font-bold text-base cursor-pointer"
+                        style={{ gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}
+                        whileHover={{ x: 8, scale: 1.05 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                       >
-                        <span className="text-sm tracking-wide">Reservar Veículo</span>
-                        <ArrowRight className="w-4 h-4" />
+                        <span className="tracking-wide">RESERVAR VEÍCULO</span>
+                        <ArrowRight className="w-5 h-5" />
                       </motion.div>
                     </div>
                   </div>
                 </motion.article>
               ))}
-            </div>
-          </div>
-          
-          {/* Mobile Slider Dots */}
-          <motion.div 
-            className="flex justify-center"
-            style={{ marginTop: 'var(--space-8)' }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <div className="flex items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2" style={{ gap: 'var(--space-2)' }}>
-              {categories.map((_, index) => (
-                <motion.button
-                  key={`dot-${index}`}
-                  className="relative cursor-pointer"
-                  onClick={() => goToSlide(index)}
-                  whileHover={{ scale: 1.3 }}
-                  whileTap={{ scale: 0.8 }}
-                >
-                  <div className="w-2 h-2 rounded-full bg-gray-400/40" />
-                  <motion.div
-                    className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{
-                      scale: index === currentSlide ? 1 : 0,
-                      opacity: index === currentSlide ? 1 : 0
+            </motion.div>
+            
+            {/* Enhanced Navigation Indicators */}
+            <motion.div 
+              className="flex justify-center items-center"
+              style={{ gap: 'var(--space-4)', marginTop: 'var(--space-6)' }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+            >
+              {/* Navigation Arrows */}
+              <motion.button
+                className="flex items-center text-gray-500 hover:text-amber-600 transition-colors"
+                style={{ gap: 'var(--space-1)' }}
+                onClick={goToPrevious}
+                whileHover={{ x: -2, scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span className="text-xs font-medium">Anterior</span>
+              </motion.button>
+              
+              {/* Interactive Dots */}
+              <div className="flex" style={{ gap: 'var(--space-2)' }}>
+                {categories.map((_, index) => (
+                  <motion.button
+                    key={index}
+                    className="rounded-full transition-all duration-300 cursor-pointer"
+                    style={{
+                      width: index === currentSlide ? '24px' : '8px',
+                      height: '8px',
+                      background: index === currentSlide 
+                        ? 'linear-gradient(135deg, #F59E0B, #FBBF24)' 
+                        : 'rgba(156, 163, 175, 0.4)',
+                      boxShadow: index === currentSlide 
+                        ? '0 4px 12px rgba(245,158,11,0.3)'
+                        : 'none'
                     }}
-                    transition={{ 
-                      type: 'spring', 
-                      stiffness: 300, 
-                      damping: 20,
-                      duration: 0.3 
-                    }}
-                  />
-                  <motion.div
-                    className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400/60"
-                    initial={{ scale: 0, opacity: 0 }}
+                    onClick={() => goToSlide(index)}
                     whileHover={{ 
-                      scale: 1.5, 
-                      opacity: 0.6,
-                      transition: { duration: 0.2 }
+                      scale: 1.2,
+                      background: index === currentSlide 
+                        ? 'linear-gradient(135deg, #F59E0B, #FBBF24)' 
+                        : 'rgba(156, 163, 175, 0.6)'
                     }}
+                    whileTap={{ scale: 0.9 }}
                   />
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
+                ))}
+              </div>
+              
+              {/* Navigation Arrows */}
+              <motion.button
+                className="flex items-center text-gray-500 hover:text-amber-600 transition-colors"
+                style={{ gap: 'var(--space-1)' }}
+                onClick={goToNext}
+                whileHover={{ x: 2, scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-xs font-medium">Próximo</span>
+                <ChevronRight className="w-4 h-4" />
+              </motion.button>
+            </motion.div>
+          </div>
         </div>
 
         {/* Editorial Call-to-Action */}
@@ -662,44 +775,28 @@ export default function VehicleCategoriesSection() {
                   Temos uma frota com mais de 50 modelos premium. Nossos especialistas encontrarão o veículo perfeito para sua experiência em Orlando.
                 </p>
                 
-                {/* Premium CTAs */}
-                <div className="flex flex-col sm:flex-row items-center justify-center" style={{ gap: 'var(--space-4)' }}>
+                {/* Premium CTA - Destaque para Especialista */}
+                <div className="flex justify-center">
                   <motion.button
-                    className="inline-flex items-center bg-amber-500 hover:bg-amber-400 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden"
+                    className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-lg tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden shadow-2xl"
                     style={{ 
-                      padding: 'var(--space-4) var(--space-10)',
-                      gap: 'var(--space-3)',
-                      borderRadius: '8px'
+                      padding: 'var(--space-5) var(--space-12)',
+                      gap: 'var(--space-4)',
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 32px rgba(245,158,11,0.4), 0 4px 16px rgba(245,158,11,0.2)'
                     }}
-                    onClick={() => document.getElementById('calculadora')?.scrollIntoView({ behavior: 'smooth' })}
+                    onClick={() => openWhatsAppMessage('hero')}
                     whileHover={{ 
-                      scale: 1.05,
-                      y: -3,
+                      scale: 1.08,
+                      y: -6,
+                      boxShadow: '0 12px 40px rgba(245,158,11,0.5), 0 6px 20px rgba(245,158,11,0.3)',
                       transition: { type: 'spring', stiffness: 400, damping: 17 }
                     }}
-                    whileTap={{ scale: 0.98 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    <span className="relative z-10">Calcular Orçamento</span>
-                    <ArrowRight className="w-5 h-5 relative z-10" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                  </motion.button>
-                  
-                  <motion.button
-                    className="inline-flex items-center border-2 border-white/80 hover:border-white text-white hover:bg-white hover:text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer"
-                    style={{ 
-                      padding: 'var(--space-4) var(--space-10)',
-                      gap: 'var(--space-3)',
-                      borderRadius: '8px'
-                    }}
-                    onClick={() => document.getElementById('contato')?.scrollIntoView({ behavior: 'smooth' })}
-                    whileHover={{ 
-                      scale: 1.05,
-                      y: -3,
-                      transition: { type: 'spring', stiffness: 400, damping: 17 }
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <span>Falar com Especialista</span>
+                    <span className="relative z-10 font-black">FALAR COM ESPECIALISTA</span>
+                    <ArrowRight className="w-6 h-6 relative z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
                   </motion.button>
                 </div>
               </div>

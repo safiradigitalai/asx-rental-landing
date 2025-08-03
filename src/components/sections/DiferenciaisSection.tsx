@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import { 
   CreditCard, 
   Shield, 
@@ -11,6 +12,7 @@ import {
   CheckCircle,
   ArrowRight
 } from 'lucide-react';
+import { openWhatsAppDiferenciais } from '@/lib/whatsapp';
 
 interface DiferencialCard {
   icon: React.ReactNode;
@@ -20,6 +22,16 @@ interface DiferencialCard {
 }
 
 export default function DiferenciaisSection() {
+  // Tags personalizadas para cada diferencial
+  const customTags = ['Segurança', 'Livre', 'Ilimitado', '24/7', 'Express', 'Grátis'];
+  
+  // Estado para controlar o slider
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  
   const diferenciais: DiferencialCard[] = [
     {
       icon: <CreditCard className="w-6 h-6" />,
@@ -54,6 +66,163 @@ export default function DiferenciaisSection() {
       description: "Cadeirinhas para crianças incluídas sem custo adicional."
     }
   ];
+
+  // Slides para o mobile (apenas os 5 diferenciais, sem o primeiro que é o hero)
+  const mobileSlides = diferenciais.slice(1);
+  const totalSlides = mobileSlides.length;
+
+  // Auto-play effect
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    }, 4000); // Troca a cada 4 segundos
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, totalSlides]);
+
+  // Detectar mudança de scroll manual e manter sincronização
+  useEffect(() => {
+    const container = sliderRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      if (isScrolling) return; // Ignora se estivermos fazendo scroll programático
+      
+      const scrollLeft = container.scrollLeft;
+      const containerWidth = container.clientWidth;
+      const cardWidth = 320;
+      const gap = 24;
+      const padding = containerWidth / 2 - cardWidth / 2; // Padding dinâmico
+      
+      // Calcular qual card está mais próximo do centro da tela
+      const adjustedScroll = scrollLeft + padding;
+      const approximateIndex = Math.round(adjustedScroll / (cardWidth + gap));
+      const clampedIndex = Math.max(0, Math.min(approximateIndex, mobileSlides.length - 1));
+      
+      if (clampedIndex !== currentSlide) {
+        setCurrentSlide(clampedIndex);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [currentSlide, isScrolling, mobileSlides.length]);
+
+  // Garantir centralização em todas as situações
+  useEffect(() => {
+    const ensureCentered = () => {
+      if (sliderRef.current) {
+        const newPosition = getScrollPosition(currentSlide);
+        sliderRef.current.scrollLeft = newPosition;
+      }
+    };
+
+    // Tentar centralizar imediatamente
+    ensureCentered();
+    
+    // Tentar novamente após um pequeno delay (para garantir que o DOM esteja pronto)
+    const timer1 = setTimeout(ensureCentered, 50);
+    const timer2 = setTimeout(ensureCentered, 150);
+    const timer3 = setTimeout(ensureCentered, 300);
+    
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [currentSlide]); // Executa sempre que currentSlide mudar
+
+  // Reposicionar quando a tela mudar de tamanho
+  useEffect(() => {
+    const handleResize = () => {
+      if (sliderRef.current) {
+        const newPosition = getScrollPosition(currentSlide);
+        sliderRef.current.scrollLeft = newPosition;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [currentSlide]);
+
+  // Scroll para o slide atual
+  useEffect(() => {
+    if (sliderRef.current) {
+      const slideWidth = 320; // largura do card
+      const gap = 24; // var(--space-4) = 24px
+      
+      // Calcula posição do slide
+      const scrollPosition = currentSlide * (slideWidth + gap);
+      
+      sliderRef.current.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentSlide]);
+
+  // Função para calcular a posição de scroll para centralizar um card
+  const getScrollPosition = (index: number) => {
+    if (!sliderRef.current) return 0;
+    
+    const cardWidth = 320; // Largura fixa dos cards (clamp mínimo)
+    const gap = 24; // var(--space-6) = 24px
+    
+    // Posição do card específico no scroll
+    const cardPosition = index * (cardWidth + gap);
+    
+    // A posição de scroll necessária para centralizar o card
+    const scrollPosition = cardPosition;
+    
+    return Math.max(0, scrollPosition);
+  };
+
+  // Navegar para um slide específico com transição suave
+  const goToSlide = (index: number) => {
+    if (isScrolling || !sliderRef.current) return;
+    
+    setIsScrolling(true);
+    setIsTransitioning(true);
+    setIsAutoPlaying(false); // Para o autoplay quando usuário interage
+    
+    // Fade out suave
+    setTimeout(() => {
+      const scrollPosition = getScrollPosition(index);
+      
+      sliderRef.current?.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
+      
+      // Atualizar o estado durante a transição
+      setCurrentSlide(index);
+      
+      // Fade in após posicionamento
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 200);
+      
+    }, 100);
+    
+    // Reset scrolling flag after animation completa
+    setTimeout(() => setIsScrolling(false), 800);
+    
+    // Retoma autoplay após 8 segundos de inatividade
+    setTimeout(() => {
+      setIsAutoPlaying(true);
+    }, 8000);
+  };
+
+  // Pausar autoplay quando hover nos cards
+  const handleMouseEnter = () => {
+    setIsAutoPlaying(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsAutoPlaying(true);
+  };
 
   return (
     <section id="diferenciais" className="editorial-section bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
@@ -203,7 +372,7 @@ export default function DiferenciaisSection() {
                 whileHover={{ scale: 1.05, backgroundColor: 'rgba(245, 158, 11, 0.3)' }}
               >
                 <CreditCard className="w-4 h-4" />
-                <span>Exclusivo Premium</span>
+                <span>Segurança Total</span>
               </motion.div>
               
               <h3 className="text-editorial-md leading-tight" style={{ marginBottom: 'var(--space-6)' }}>
@@ -225,6 +394,7 @@ export default function DiferenciaisSection() {
                 style={{ gap: 'var(--space-3)' }}
                 whileHover={{ x: 8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                onClick={() => openWhatsAppDiferenciais('Pagamento só após receber')}
               >
                 <span className="text-base tracking-wide">Descobrir mais vantagens</span>
                 <ArrowRight className="w-5 h-5" />
@@ -253,7 +423,7 @@ export default function DiferenciaisSection() {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <CreditCard className="w-3 h-3" />
-                <span>Premium</span>
+                <span>Seguro</span>
               </motion.div>
               
               {/* Mobile Hero Title - Simplified */}
@@ -276,6 +446,7 @@ export default function DiferenciaisSection() {
                 style={{ gap: 'var(--space-2)' }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                onClick={() => openWhatsAppDiferenciais('Pagamento só após receber')}
               >
                 <span className="tracking-wide">Ver mais vantagens</span>
                 <ArrowRight className="w-4 h-4" />
@@ -361,7 +532,7 @@ export default function DiferenciaisSection() {
                           }}
                         >
                           {diferencial.icon}
-                          <span>Premium</span>
+                          <span>{customTags[index + 1]}</span>
                         </div>
                         
                         <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-2)' }}>
@@ -381,6 +552,7 @@ export default function DiferenciaisSection() {
                           style={{ gap: 'var(--space-3)' }}
                           whileHover={{ x: 8 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                          onClick={() => openWhatsAppDiferenciais(diferencial.title)}
                         >
                           <span className="text-base tracking-wide">Descobrir vantagem</span>
                           <ArrowRight className="w-5 h-5" />
@@ -468,7 +640,7 @@ export default function DiferenciaisSection() {
                           }}
                         >
                           {diferencial.icon}
-                          <span>Premium</span>
+                          <span>{customTags[index + 1]}</span>
                         </div>
                         
                         <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-2)' }}>
@@ -488,6 +660,7 @@ export default function DiferenciaisSection() {
                           style={{ gap: 'var(--space-3)' }}
                           whileHover={{ x: 8 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                          onClick={() => openWhatsAppDiferenciais(diferencial.title)}
                         >
                           <span className="text-base tracking-wide">Descobrir vantagem</span>
                           <ArrowRight className="w-5 h-5" />
@@ -573,7 +746,7 @@ export default function DiferenciaisSection() {
                           }}
                         >
                           {diferencial.icon}
-                          <span>Premium</span>
+                          <span>{customTags[index + 1]}</span>
                         </div>
                         
                         <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-2)' }}>
@@ -593,6 +766,7 @@ export default function DiferenciaisSection() {
                           style={{ gap: 'var(--space-3)' }}
                           whileHover={{ x: 8 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                          onClick={() => openWhatsAppDiferenciais(diferencial.title)}
                         >
                           <span className="text-base tracking-wide">Descobrir vantagem</span>
                           <ArrowRight className="w-5 h-5" />
@@ -605,26 +779,58 @@ export default function DiferenciaisSection() {
             </div>
             
             {/* Mobile Swipe Slider */}
-            <div className="lg:hidden overflow-x-auto scrollbar-hide">
-              <div className="flex" style={{ gap: 'var(--space-4)', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}>
-                {diferenciais.slice(1).map((diferencial, index) => {
+            <motion.div 
+              ref={sliderRef}
+              className="lg:hidden overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              style={{
+                paddingTop: 'var(--space-4)',
+                paddingBottom: 'var(--space-4)',
+                paddingLeft: 'calc(50vw - 160px)', // Centralizar primeiro card
+                paddingRight: 'calc(50vw - 160px)'  // Centralizar último card
+              }}
+              animate={{
+                opacity: isTransitioning ? 0.8 : 1,
+              }}
+              transition={{
+                duration: 0.3,
+                ease: [0.4, 0, 0.2, 1]
+              }}
+            >
+              <div 
+                className="flex" 
+                style={{ gap: 'var(--space-6)' }}
+              >
+                {mobileSlides.map((diferencial, index) => {
                   const isHighlight = diferencial.highlight;
                   return (
                     <motion.article
                       key={`mobile-${index + 1}`}
-                      className="relative overflow-hidden group cursor-pointer flex-shrink-0"
+                      className="relative overflow-hidden group cursor-pointer flex-shrink-0 snap-center"
                       style={{ 
-                        width: '300px',
-                        height: '380px',
+                        width: '320px', // Largura fixa para cálculos precisos
+                        height: '420px',
                         borderRadius: '16px'
                       }}
                       initial={{ opacity: 0, x: 50 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
+                      animate={{ 
+                        opacity: 1, 
+                        x: 0,
+                        scale: index === currentSlide ? 1.03 : 1,
+                        y: index === currentSlide ? -4 : 0,
+                      }}
                       transition={{ 
                         duration: 0.6, 
                         delay: index * 0.1,
-                        ease: [0.6, -0.05, 0.01, 0.99]
+                        ease: [0.6, -0.05, 0.01, 0.99],
+                        scale: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+                        y: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
+                      }}
+                      whileHover={{ 
+                        y: -8,
+                        scale: 1.05,
+                        transition: { type: 'spring', stiffness: 300, damping: 20 }
                       }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -634,6 +840,18 @@ export default function DiferenciaisSection() {
                             ? 'bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900' 
                             : 'bg-gradient-to-br from-gray-900 via-gray-800 to-black'
                         }`}
+                        animate={{
+                          boxShadow: index === currentSlide 
+                            ? (isHighlight 
+                                ? '0 20px 40px rgba(59,130,246,0.15), 0 8px 25px rgba(59,130,246,0.1)'
+                                : '0 20px 40px rgba(245,158,11,0.15), 0 8px 25px rgba(245,158,11,0.1)')
+                            : '0 8px 25px rgba(0,0,0,0.1)'
+                        }}
+                        transition={{ 
+                          duration: 0.6, 
+                          ease: 'easeOut',
+                          boxShadow: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
+                        }}
                       />
                       
                       <motion.div 
@@ -651,26 +869,30 @@ export default function DiferenciaisSection() {
                       }`} />
                       
                       <div 
-                        className="relative z-10 h-full flex flex-col text-white editorial-stack"
+                        className="relative z-10 h-full flex flex-col justify-center text-white"
                         style={{ padding: 'var(--space-6)' }}
                       >
-                        <div 
-                          className={`inline-flex items-center backdrop-blur-sm border text-xs font-medium tracking-[0.2em] uppercase w-fit ${
-                            isHighlight 
-                              ? 'bg-blue-400/20 border-blue-300/30 text-blue-200' 
-                              : 'bg-amber-500/20 border-amber-400/30 text-amber-300'
-                          }`}
-                          style={{ 
-                            gap: 'var(--space-1)', 
-                            padding: 'var(--space-1) var(--space-3)'
-                          }}
-                        >
-                          {diferencial.icon}
-                          <span>Premium</span>
+                        {/* Badge */}
+                        <div className="mb-6">
+                          <div 
+                            className={`inline-flex items-center backdrop-blur-sm border text-xs font-medium tracking-[0.2em] uppercase ${
+                              isHighlight 
+                                ? 'bg-blue-400/20 border-blue-300/30 text-blue-200' 
+                                : 'bg-amber-500/20 border-amber-400/30 text-amber-300'
+                            }`}
+                            style={{ 
+                              gap: 'var(--space-1)', 
+                              padding: 'var(--space-1) var(--space-3)'
+                            }}
+                          >
+                            {diferencial.icon}
+                            <span>{customTags[index + 1]}</span>
+                          </div>
                         </div>
                         
-                        <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-1)' }}>
-                          <h3 className="text-headline font-bold leading-tight tracking-tight" style={{ marginBottom: 'var(--space-2)' }}>
+                        {/* Conteúdo Central */}
+                        <div className="text-left flex-1 flex flex-col justify-center editorial-stack-sm">
+                          <h3 className="text-xl font-bold leading-tight tracking-tight">
                             {diferencial.title.toUpperCase()}
                           </h3>
                           
@@ -679,21 +901,25 @@ export default function DiferenciaisSection() {
                           </p>
                         </div>
                         
-                        <div 
-                          className={`flex items-center font-medium cursor-pointer ${
-                            isHighlight ? 'text-blue-300' : 'text-amber-300'
-                          }`}
-                          style={{ gap: 'var(--space-2)' }}
-                        >
-                          <span className="text-sm tracking-wide">Descobrir</span>
-                          <ArrowRight className="w-4 h-4" />
+                        {/* Botão na base do card */}
+                        <div className="mt-6">
+                          <div 
+                            className={`flex items-center font-medium cursor-pointer ${
+                              isHighlight ? 'text-blue-300' : 'text-amber-300'
+                            }`}
+                            style={{ gap: 'var(--space-2)' }}
+                            onClick={() => openWhatsAppDiferenciais(diferencial.title)}
+                          >
+                            <span className="text-sm tracking-wide">Descobrir</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </div>
                         </div>
                       </div>
                     </motion.article>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
             
             {/* Mobile Slider Dots - Elegant Indicators */}
             <motion.div 
@@ -704,44 +930,30 @@ export default function DiferenciaisSection() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <div className="flex items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2" style={{ gap: 'var(--space-2)' }}>
-                {diferenciais.slice(1).map((_, index) => (
-                  <motion.div
+              <div className="flex" style={{ gap: 'var(--space-2)' }}>
+                {mobileSlides.map((_, index) => (
+                  <motion.button
                     key={`dot-${index}`}
-                    className="relative cursor-pointer"
-                    whileHover={{ scale: 1.3 }}
-                    whileTap={{ scale: 0.8 }}
-                  >
-                    {/* Dot Background */}
-                    <div className="w-2 h-2 rounded-full bg-gray-400/40" />
-                    
-                    {/* Active Dot Indicator */}
-                    <motion.div
-                      className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400"
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{
-                        scale: index === 0 ? 1 : 0,
-                        opacity: index === 0 ? 1 : 0
-                      }}
-                      transition={{ 
-                        type: 'spring', 
-                        stiffness: 300, 
-                        damping: 20,
-                        duration: 0.3 
-                      }}
-                    />
-                    
-                    {/* Hover Glow Effect */}
-                    <motion.div
-                      className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400/60"
-                      initial={{ scale: 0, opacity: 0 }}
-                      whileHover={{ 
-                        scale: 1.5, 
-                        opacity: 0.6,
-                        transition: { duration: 0.2 }
-                      }}
-                    />
-                  </motion.div>
+                    className="rounded-full transition-all duration-300 cursor-pointer"
+                    style={{
+                      width: index === currentSlide ? '24px' : '8px',
+                      height: '8px',
+                      background: index === currentSlide 
+                        ? 'linear-gradient(135deg, #F59E0B, #FBBF24)' 
+                        : 'rgba(156, 163, 175, 0.4)',
+                      boxShadow: index === currentSlide 
+                        ? '0 4px 12px rgba(245,158,11,0.3)'
+                        : 'none'
+                    }}
+                    onClick={() => goToSlide(index)}
+                    whileHover={{ 
+                      scale: 1.2,
+                      background: index === currentSlide 
+                        ? 'linear-gradient(135deg, #F59E0B, #FBBF24)' 
+                        : 'rgba(156, 163, 175, 0.6)'
+                    }}
+                    whileTap={{ scale: 0.9 }}
+                  />
                 ))}
               </div>
             </motion.div>
@@ -811,7 +1023,7 @@ export default function DiferenciaisSection() {
                 >
                   EXPLORE NOSSA{' '}
                   <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text">
-                    FROTA PREMIUM
+                    FROTA
                   </span>
                 </motion.h3>
                 
@@ -839,6 +1051,9 @@ export default function DiferenciaisSection() {
                     transition: { type: 'spring', stiffness: 400, damping: 17 }
                   }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    document.getElementById('categorias')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                 >
                   <span className="relative z-10">Ver Categorias de Veículos</span>
                   <ArrowRight className="w-5 h-5 relative z-10" />
@@ -856,7 +1071,7 @@ export default function DiferenciaisSection() {
                     NOSSA FROTA
                   </span>
                   <br />
-                  <span className="text-white">PREMIUM</span>
+                  <span className="text-white">COMPLETA</span>
                 </h3>
                 
                 {/* Mobile Description - Concise */}
@@ -874,6 +1089,9 @@ export default function DiferenciaisSection() {
                   }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                  onClick={() => {
+                    document.getElementById('categorias')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                 >
                   <span>Ver Veículos</span>
                   <ArrowRight className="w-4 h-4" />
