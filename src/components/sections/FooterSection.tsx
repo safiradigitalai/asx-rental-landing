@@ -287,7 +287,7 @@ export default function FooterSection() {
                         {column.links.map((link, linkIndex) => (
                           <motion.li key={linkIndex}>
                             <motion.button
-                              className="group flex items-center text-white/70 hover:text-amber-300 transition-all duration-300 text-sm"
+                              className="group flex items-center text-white/70 hover:text-amber-300 transition-all duration-300 text-sm cursor-pointer"
                               style={{ gap: 'var(--space-2)' }}
                               whileHover={{ x: 4 }}
                               onClick={() => scrollToSection('#categorias')}
@@ -332,7 +332,7 @@ export default function FooterSection() {
                   ].map((social, index) => (
                     <motion.button
                       key={index}
-                      className={`w-10 h-10 bg-white/5 backdrop-blur-sm border border-white/15 hover:bg-white/10 hover:border-white/25 text-white/70 ${social.color} transition-all duration-300 flex items-center justify-center group`}
+                      className={`w-10 h-10 bg-white/5 backdrop-blur-sm border border-white/15 hover:bg-white/10 hover:border-white/25 text-white/70 ${social.color} transition-all duration-300 flex items-center justify-center group cursor-pointer`}
                       style={{ borderRadius: '12px' }}
                       whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
@@ -347,7 +347,7 @@ export default function FooterSection() {
                   {['Política de Privacidade', 'Termos de Uso'].map((link, index) => (
                     <motion.button
                       key={index}
-                      className="text-white/50 hover:text-amber-300 transition-colors duration-300 text-xs block"
+                      className="text-white/50 hover:text-amber-300 transition-colors duration-300 text-xs block cursor-pointer"
                       whileHover={{ x: 2 }}
                       onClick={() => scrollToSection('#')}
                     >

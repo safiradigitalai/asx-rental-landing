@@ -304,7 +304,7 @@ export default function TestimonialsSection() {
               {/* Navigation Arrows */}
               <button
                 onClick={prevTestimonial}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:text-amber-300 hover:bg-white/15 transition-all duration-300"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:text-amber-300 hover:bg-white/15 transition-all duration-300 cursor-pointer"
                 style={{ 
                   padding: 'var(--space-3)', 
                   borderRadius: '12px' 
@@ -316,7 +316,7 @@ export default function TestimonialsSection() {
               
               <button
                 onClick={nextTestimonial}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:text-amber-300 hover:bg-white/15 transition-all duration-300"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:text-amber-300 hover:bg-white/15 transition-all duration-300 cursor-pointer"
                 style={{ 
                   padding: 'var(--space-3)', 
                   borderRadius: '12px' 
@@ -335,7 +335,7 @@ export default function TestimonialsSection() {
             <button
               key={index}
               onClick={() => goToTestimonial(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer ${
                 index === currentIndex 
                   ? 'bg-amber-500 scale-125' 
                   : 'bg-gray-300 hover:bg-gray-400'

@@ -86,7 +86,7 @@ Origem: ${initialData?.origem || 'calculadora'}`;
       >
         {/* Backdrop */}
         <motion.div
-          className="absolute inset-0 bg-black/90 backdrop-blur-md"
+          className="absolute inset-0 bg-black/90 backdrop-blur-md cursor-pointer"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -171,7 +171,7 @@ Origem: ${initialData?.origem || 'calculadora'}`;
               </div>
               
               <motion.button
-                className="w-12 h-12 bg-white/5 hover:bg-red-500/20 border border-white/20 hover:border-red-400/40 text-white/70 hover:text-red-400 transition-all duration-300 flex items-center justify-center group"
+                className="w-12 h-12 bg-white/5 hover:bg-red-500/20 border border-white/20 hover:border-red-400/40 text-white/70 hover:text-red-400 transition-all duration-300 flex items-center justify-center group cursor-pointer"
                 style={{ borderRadius: '16px' }}
                 onClick={onClose}
                 whileHover={{ scale: 1.05, rotate: 90 }}

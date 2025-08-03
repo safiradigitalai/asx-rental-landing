@@ -367,7 +367,7 @@ export default function VehicleCategoriesSection() {
           {/* Navigation Arrows */}
           <div className="flex items-center justify-center mb-6" style={{ gap: 'var(--space-4)' }}>
             <motion.button
-              className="flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300"
+              className="flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300 cursor-pointer"
               style={{ 
                 width: '48px', 
                 height: '48px', 
@@ -390,7 +390,7 @@ export default function VehicleCategoriesSection() {
             </div>
             
             <motion.button
-              className="flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300"
+              className="flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300 cursor-pointer"
               style={{ 
                 width: '48px', 
                 height: '48px', 
