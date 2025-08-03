@@ -5,15 +5,12 @@ import {
   Phone, 
   Mail, 
   Clock, 
-  Facebook, 
-  Instagram, 
-  Twitter,
+  Instagram,
   Star,
   Shield,
   CreditCard,
   ArrowRight,
-  MessageCircle,
-  Heart
+  MessageCircle
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 
@@ -315,40 +312,32 @@ export default function FooterSection() {
             >
               <div className="absolute inset-0 bg-white/5 backdrop-blur-md border border-white/15" />
               
-              <div className="relative z-10 text-white" style={{ padding: 'var(--space-6)' }}>
-                <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-1)' }}>
+              <div className="relative z-10 text-white text-center" style={{ padding: 'var(--space-6)' }}>
+                <div className="flex justify-center" style={{ marginBottom: 'var(--space-4)' }}>
                   <h4 className="text-amber-400 font-semibold text-sm tracking-[0.2em] uppercase">
                     Conecte-se
                   </h4>
-                  <Heart className="w-4 h-4 text-amber-400/60" />
                 </div>
                 
-                {/* Social Links */}
-                <div className="flex items-center" style={{ gap: 'var(--space-3)', marginBottom: 'var(--space-1)' }}>
-                  {[
-                    { icon: Facebook, color: 'hover:text-blue-400' },
-                    { icon: Instagram, color: 'hover:text-pink-400' },
-                    { icon: Twitter, color: 'hover:text-sky-400' }
-                  ].map((social, index) => (
-                    <motion.button
-                      key={index}
-                      className={`w-10 h-10 bg-white/5 backdrop-blur-sm border border-white/15 hover:bg-white/10 hover:border-white/25 text-white/70 ${social.color} transition-all duration-300 flex items-center justify-center group cursor-pointer`}
-                      style={{ borderRadius: '12px' }}
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <social.icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                    </motion.button>
-                  ))}
+                {/* Social Link - Only Instagram */}
+                <div className="flex justify-center" style={{ marginBottom: 'var(--space-4)' }}>
+                  <motion.button
+                    className="w-12 h-12 bg-white/5 backdrop-blur-sm border border-white/15 hover:bg-white/10 hover:border-white/25 text-white/70 hover:text-pink-400 transition-all duration-300 flex items-center justify-center group cursor-pointer"
+                    style={{ borderRadius: '12px' }}
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Instagram className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                  </motion.button>
                 </div>
 
-                {/* Legal Links */}
-                <div className="space-y-2">
+                {/* Legal Links - Centralized */}
+                <div className="space-y-2 text-center">
                   {['Política de Privacidade', 'Termos de Uso'].map((link, index) => (
                     <motion.button
                       key={index}
-                      className="text-white/50 hover:text-amber-300 transition-colors duration-300 text-xs block cursor-pointer"
-                      whileHover={{ x: 2 }}
+                      className="text-white/50 hover:text-amber-300 transition-colors duration-300 text-xs block cursor-pointer w-full"
+                      whileHover={{ scale: 1.02 }}
                       onClick={() => scrollToSection('#')}
                     >
                       {link}

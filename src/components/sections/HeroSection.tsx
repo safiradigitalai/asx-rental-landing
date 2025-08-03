@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowRight, Star, ChevronDown, Play } from 'lucide-react';
+import { ArrowRight, Star, ChevronDown } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 
 export default function HeroSection() {

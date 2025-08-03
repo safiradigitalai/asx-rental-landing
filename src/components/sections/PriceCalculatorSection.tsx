@@ -14,7 +14,8 @@ import {
   Clock, 
   Sparkles,
   MessageCircle,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
 import { differenceInDays, addDays, format } from 'date-fns';
 import { dailyPrices } from '@/lib/supabase';
@@ -23,11 +24,19 @@ export default function PriceCalculatorSection() {
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof dailyPrices>('Sedan');
   const [checkInDate, setCheckInDate] = useState('');
   const [checkOutDate, setCheckOutDate] = useState('');
-  const [passengers, setPassengers] = useState(2);
+  const [passengers, setPassengers] = useState(0);
   const [step, setStep] = useState(1);
   const [isCalculating, setIsCalculating] = useState(false);
   const [showQuickDates, setShowQuickDates] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [clientName, setClientName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [needsCarSeat, setNeedsCarSeat] = useState(false);
+  const [carSeatQuantity, setCarSeatQuantity] = useState(1);
+  const [modalStep, setModalStep] = useState(1); // 1: Summary, 2: Client Data
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   // Quick date suggestions
   const quickDateOptions = [
@@ -45,7 +54,7 @@ export default function PriceCalculatorSection() {
     if (checkInDate && checkOutDate && step === 2) {
       setStep(3);
     }
-    if (passengers && step === 3) {
+    if (passengers > 0 && step === 3) {
       setStep(4);
     }
   }, [selectedCategory, checkInDate, checkOutDate, passengers, step]);
@@ -95,7 +104,7 @@ export default function PriceCalculatorSection() {
       name: 'Minivan Luxo', 
       description: 'Máximo conforto para grupos',
       passengers: '5-8 pessoas',
-      features: ['Premium', 'Couro', 'Entretenimento'],
+      features: ['Luxo', 'Couro', 'Entretenimento'],
       popular: true
     },
     { 
@@ -110,7 +119,7 @@ export default function PriceCalculatorSection() {
       name: 'Esportivo', 
       description: 'Experiência única de dirigir',
       passengers: '2-4 pessoas',
-      features: ['Alta performance', 'Design único', 'Experiência premium']
+      features: ['Alta performance', 'Design único', 'Experiência exclusiva']
     },
     { 
       key: 'SUV Luxo' as const, 
@@ -124,7 +133,6 @@ export default function PriceCalculatorSection() {
   // Filter categories for display
   const popularCategories = categories.filter(cat => cat.popular);
   const otherCategories = categories.filter(cat => !cat.popular);
-  const categoriesToShow = showAllCategories ? categories : popularCategories;
 
   // Handle quick date selection
   const handleQuickDate = (days: number) => {
@@ -144,20 +152,109 @@ export default function PriceCalculatorSection() {
   // Handle reservation
   const handleReservation = () => {
     if (total > 0) {
-      const modalData = {
-        categoria: selectedCategory,
-        dataChegada: checkInDate,
-        dataSaida: checkOutDate,
-        passageiros: passengers,
-        origem: 'calculadora',
-        precoDiaria: daily,
-        precoTotal: total,
-        diasLocacao: days
-      };
-
-      // Dispatch custom event to open modal
-      window.dispatchEvent(new CustomEvent('openLeadModal', { detail: modalData }));
+      setShowReservationModal(true);
     }
+  };
+
+  // Move to client data step
+  const proceedToClientData = () => {
+    setModalStep(2);
+  };
+
+  // Go back to summary
+  const backToSummary = () => {
+    setModalStep(1);
+  };
+
+  // Validate client data
+  const validateClientData = () => {
+    return clientName.trim() && clientEmail.trim() && clientPhone.trim();
+  };
+
+  // Send to WhatsApp with complete data
+  const sendToWhatsApp = () => {
+    if (!validateClientData()) return;
+
+    const checkInFormatted = new Date(checkInDate + 'T12:00:00').toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    const checkOutFormatted = new Date(checkOutDate + 'T12:00:00').toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const categoryDetails = {
+      'Sedan': '🚗 Sedan - Econômico e confortável',
+      'SUV': '🚙 SUV - Espaçoso e versátil',
+      'SUV Luxo': '🚙 SUV Luxo - Premium e espaçoso', 
+      'Minivan Regular': '🚐 Minivan Regular - Ideal para grupos',
+      'Minivan Luxo': '🚐 Minivan Luxo - Máximo conforto para grupos',
+      'Esportivo': '🏎️ Esportivo - Performance e estilo',
+      'Suburban': '🚛 Suburban - SUV grande premium'
+    };
+
+    const whatsappMessage = `🚗 *NOVA RESERVA ASX RENTAL*\n` +
+      `══════════════════════════════════════\n\n` +
+      `👤 *DADOS DO CLIENTE*\n` +
+      `• Nome: ${clientName}\n` +
+      `• WhatsApp: ${clientPhone}\n` +
+      `• Email: ${clientEmail}\n\n` +
+      `🚙 *DETALHES DA RESERVA*\n` +
+      `• Veículo: ${categoryDetails[selectedCategory] || selectedCategory}\n` +
+      `• Passageiros: ${passengers} ${passengers === 1 ? 'pessoa' : 'pessoas'}\n` +
+      `• Cadeirinha: ${needsCarSeat ? `Sim (${carSeatQuantity}x)` : 'Não necessário'}\n\n` +
+      `📅 *PERÍODO DA LOCAÇÃO*\n` +
+      `• Check-in: ${checkInFormatted}\n` +
+      `• Check-out: ${checkOutFormatted}\n` +
+      `• Duração: ${days} ${days === 1 ? 'dia' : 'dias'}\n\n` +
+      `💰 *RESUMO FINANCEIRO*\n` +
+      `• Valor da diária: $${daily.toFixed(2)} USD\n` +
+      `• Quantidade de dias: ${days}x\n` +
+      `• Subtotal: $${total.toFixed(2)} USD\n` +
+      `• Taxa de serviço: $0.00 USD\n` +
+      `• **TOTAL FINAL: $${total.toFixed(2)} USD**\n\n` +
+      `📋 *PRÓXIMOS PASSOS DA EQUIPE*\n` +
+      `✅ Confirmar disponibilidade para as datas\n` +
+      `✅ Enviar fotos detalhadas do veículo\n` +
+      `✅ Confirmar local de retirada/devolução\n` +
+      `✅ Gerar link de pagamento seguro\n` +
+      `✅ Enviar contrato digital\n\n` +
+      `🔒 *DIFERENCIAIS INCLUÍDOS*\n` +
+      `• ✅ Pagamento só após receber as chaves\n` +
+      `• ✅ Zero bloqueio no cartão de crédito\n` +
+      `• ✅ Quilometragem 100% ilimitada\n` +
+      `• ✅ Seguro completo incluído\n` +
+      `• ✅ Suporte 24/7 em português\n` +
+      `• ✅ Combustível: cliente devolve como recebeu\n\n` +
+      `⏰ Reserva realizada em: ${new Date().toLocaleString('pt-BR')}\n` +
+      `🌐 Origem: Sistema de Reservas ASX\n` +
+      `══════════════════════════════════════\n\n` +
+      `*Cliente aguarda confirmação e próximos passos!* 📞`;
+
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappUrl = `https://wa.me/5584999194580?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+    
+    // Reset form and show success feedback
+    setShowReservationModal(false);
+    setModalStep(1);
+    setClientName('');
+    setClientEmail('');
+    setClientPhone('');
+    setNeedsCarSeat(false);
+    setCarSeatQuantity(1);
+    
+    // Show success toast
+    setTimeout(() => {
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 4000);
+    }, 500);
   };
 
   const today = new Date().toISOString().split('T')[0];
@@ -225,7 +322,7 @@ export default function PriceCalculatorSection() {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <Calculator className="w-4 h-4" />
-              <span>Calculadora Premium</span>
+              <span>Reserva já ASX</span>
             </motion.div>
             
             {/* Editorial Headline */}
@@ -236,9 +333,9 @@ export default function PriceCalculatorSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              CALCULE SUA{' '}
+              RESERVE SEU{' '}
               <span className="text-transparent bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 bg-clip-text">
-                LOCAÇÃO PREMIUM
+                VEÍCULO IDEAL
               </span>
             </motion.h2>
             
@@ -250,7 +347,7 @@ export default function PriceCalculatorSection() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              Preços transparentes, sem taxas ocultas. Você só paga quando estiver com as chaves na mão, com total segurança e tranquilidade.
+              Reserve agora com total segurança. Pagamento só após receber as chaves, quilometragem ilimitada e suporte especializado em português.
             </motion.p>
 
           </div>
@@ -350,7 +447,7 @@ export default function PriceCalculatorSection() {
                     <div className="editorial-stack-lg">
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold text-xl tracking-wide">
-                          Escolha seu Veículo Premium
+                          Escolha seu Veículo Ideal
                         </div>
                         <div className="text-amber-300 text-sm font-medium">
                           Passo 1 de 4
@@ -953,6 +1050,9 @@ export default function PriceCalculatorSection() {
                                   height: '64px'
                                 }}
                               >
+                                <option value={0} className="bg-gray-800 text-gray-400">
+                                  Escolha a quantidade
+                                </option>
                                 {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
                                   <option key={num} value={num} className="bg-gray-800 text-white">
                                     {num} {num === 1 ? 'pessoa' : 'pessoas'}
@@ -970,7 +1070,7 @@ export default function PriceCalculatorSection() {
                           </div>
 
                           {/* Passenger Summary */}
-                          {passengers && (
+                          {passengers > 0 && (
                             <motion.div
                               className="p-6 bg-gradient-to-r from-purple-500/10 via-purple-400/5 to-purple-500/10 border border-purple-400/30 rounded-xl text-center mx-auto"
                               style={{ marginTop: 'var(--space-1)' }}
@@ -993,7 +1093,7 @@ export default function PriceCalculatorSection() {
 
                   {/* Price Summary & Final Step */}
                   <AnimatePresence>
-                    {step >= 4 && days > 0 && total > 0 && (
+                    {step >= 4 && days > 0 && total > 0 && passengers > 0 && (
                       <motion.div 
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -1006,7 +1106,7 @@ export default function PriceCalculatorSection() {
                             <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-400/30">
                               <Calculator className="w-6 h-6 text-emerald-400" />
                             </div>
-                            Seu Orçamento Premium Está Pronto!
+                            Sua Reserva Está Quase Pronta!
                           </div>
                           <div className="flex items-center justify-center gap-3 text-emerald-300 text-sm font-medium">
                             <CheckCircle className="w-4 h-4" />
@@ -1020,7 +1120,7 @@ export default function PriceCalculatorSection() {
                           {/* Summary Card */}
                           <motion.div 
                             className="bg-gradient-to-br from-white/10 via-white/6 to-white/8 backdrop-blur-md border border-white/25 rounded-2xl overflow-hidden"
-                            style={{ padding: '3rem', marginTop: 'var(--space-2)' }}
+                            style={{ padding: 'clamp(1.5rem, 4vw, 3rem)', marginTop: 'var(--space-2)' }}
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.2 }}
@@ -1028,7 +1128,7 @@ export default function PriceCalculatorSection() {
                             {/* Header */}
                             <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-2)' }}>
                               <div>
-                                <h3 className="text-white font-bold text-2xl tracking-wide">Resumo da Reserva</h3>
+                                <h3 className="text-white font-bold text-lg sm:text-2xl tracking-wide">Resumo da Reserva</h3>
                               </div>
                               <motion.div 
                                 className="w-3 h-3 bg-emerald-400 rounded-full"
@@ -1038,7 +1138,7 @@ export default function PriceCalculatorSection() {
                             </div>
                             
                             {/* Details Grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 mb-6 sm:mb-8">
                               {[
                                 { label: 'Categoria', value: selectedCategory, icon: Car, color: 'text-amber-300' },
                                 { label: 'Passageiros', value: `${passengers} ${passengers === 1 ? 'pessoa' : 'pessoas'}`, icon: Users, color: 'text-purple-300' },
@@ -1050,16 +1150,16 @@ export default function PriceCalculatorSection() {
                                 <motion.div 
                                   key={index}
                                   className="flex items-center justify-between bg-white/5 rounded-lg border border-white/10"
-                                  style={{ padding: '1rem 1.25rem' }}
+                                  style={{ padding: 'clamp(0.75rem, 3vw, 1rem) clamp(1rem, 3vw, 1.25rem)' }}
                                   initial={{ opacity: 0, x: -20 }}
                                   animate={{ opacity: 1, x: 0 }}
                                   transition={{ duration: 0.4, delay: 0.4 + (index * 0.1) }}
                                 >
                                   <div className="flex items-center gap-3">
-                                    <item.icon className="w-4 h-4 text-white/70" />
-                                    <span className="text-white/70 font-medium">{item.label}</span>
+                                    <item.icon className="w-3 h-3 sm:w-4 sm:h-4 text-white/70" />
+                                    <span className="text-white/70 font-medium text-sm sm:text-base">{item.label}</span>
                                   </div>
-                                  <span className={`font-semibold ${item.color}`}>{item.value}</span>
+                                  <span className={`font-semibold text-sm sm:text-base ${item.color}`}>{item.value}</span>
                                 </motion.div>
                               ))}
                             </div>
@@ -1067,15 +1167,15 @@ export default function PriceCalculatorSection() {
                             {/* Total Price */}
                             <motion.div 
                               className="bg-gradient-to-r from-emerald-500/15 to-emerald-400/10 border-2 border-emerald-400/30 rounded-xl"
-                              style={{ marginTop: 'var(--space-2)', padding: '2rem 2.25rem' }}
+                              style={{ marginTop: 'var(--space-2)', padding: 'clamp(1.25rem, 4vw, 2rem) clamp(1.5rem, 4vw, 2.25rem)' }}
                               initial={{ opacity: 0, scale: 0.95 }}
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ duration: 0.6, delay: 0.8 }}
                             >
-                              <div className="flex items-center justify-between">
+                              <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-4 xs:gap-0">
                                 <div>
-                                  <div className="text-emerald-300 text-xl font-bold mb-2">TOTAL DA LOCAÇÃO</div>
-                                  <div className="text-white/60 text-sm">Pagamento apenas após receber o veículo</div>
+                                  <div className="text-emerald-300 text-lg xs:text-xl font-bold mb-2">TOTAL DA LOCAÇÃO</div>
+                                  <div className="text-white/60 text-xs xs:text-sm">Pagamento apenas após receber o veículo</div>
                                   <div className="text-white/50 text-xs mt-1">Zero bloqueio • Cancelamento gratuito</div>
                                 </div>
                                 <motion.div
@@ -1085,10 +1185,10 @@ export default function PriceCalculatorSection() {
                                   transition={{ type: "spring", stiffness: 400, damping: 17 }}
                                   className="text-right"
                                 >
-                                  <div className="text-emerald-300 font-black text-5xl">
+                                  <div className="text-emerald-300 font-black text-4xl xs:text-5xl sm:text-5xl">
                                     ${isCalculating ? '...' : total.toFixed(2)}
                                   </div>
-                                  <div className="text-white/50 text-sm">USD</div>
+                                  <div className="text-white/50 text-xs xs:text-sm">USD</div>
                                 </motion.div>
                               </div>
                             </motion.div>
@@ -1097,16 +1197,16 @@ export default function PriceCalculatorSection() {
                           {/* Payment Options */}
                           <motion.div 
                             className="bg-gradient-to-br from-white/8 via-white/4 to-white/6 backdrop-blur-md border border-white/20 rounded-2xl"
-                            style={{ padding: '2rem', marginTop: 'var(--space-2)' }}
+                            style={{ padding: 'clamp(1.25rem, 4vw, 2rem)', marginTop: 'var(--space-2)' }}
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.4 }}
                           >
-                            <h4 className="text-white font-bold text-xl" style={{ marginBottom: 'var(--space-2)' }}>
+                            <h4 className="text-white font-bold text-lg sm:text-xl" style={{ marginBottom: 'var(--space-2)' }}>
                               Formas de Pagamento
                             </h4>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                            <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
                               {[
                                 { label: 'À Vista', value: total.toFixed(2), desc: '5% desconto', color: 'emerald' },
                                 { label: '3x sem juros', value: (total / 3).toFixed(2), desc: 'por parcela', color: 'amber' },
@@ -1114,16 +1214,16 @@ export default function PriceCalculatorSection() {
                               ].map((option, index) => (
                                 <motion.div 
                                   key={index}
-                                  className={`p-4 bg-white/5 border border-white/10 rounded-lg text-center hover:bg-white/8 transition-colors cursor-pointer`}
+                                  className={`p-3 sm:p-4 bg-white/5 border border-white/10 rounded-lg text-center hover:bg-white/8 transition-colors cursor-pointer`}
                                   initial={{ opacity: 0, y: 20 }}
                                   animate={{ opacity: 1, y: 0 }}
                                   transition={{ duration: 0.4, delay: 0.6 + (index * 0.1) }}
                                   whileHover={{ scale: 1.02 }}
                                 >
-                                  <div className={`text-${option.color}-300 font-bold text-lg mb-1`}>
+                                  <div className={`text-${option.color}-300 font-bold text-base sm:text-lg mb-1`}>
                                     ${option.value}
                                   </div>
-                                  <div className="text-white font-medium text-sm mb-1">{option.label}</div>
+                                  <div className="text-white font-medium text-xs sm:text-sm mb-1">{option.label}</div>
                                   <div className="text-white/60 text-xs">{option.desc}</div>
                                 </motion.div>
                               ))}
@@ -1131,8 +1231,8 @@ export default function PriceCalculatorSection() {
 
                             {/* CTA Button */}
                             <motion.button
-                              className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-lg rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/25 group"
-                              style={{ padding: '1.25rem 2rem', marginTop: 'var(--space-2)' }}
+                              className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-base sm:text-lg rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/25 group"
+                              style={{ padding: 'clamp(1rem, 3vw, 1.25rem) clamp(1.5rem, 4vw, 2rem)', marginTop: 'var(--space-2)' }}
                               onClick={handleReservation}
                               whileHover={{ 
                                 scale: 1.01,
@@ -1145,21 +1245,21 @@ export default function PriceCalculatorSection() {
                               transition={{ duration: 0.6, delay: 1 }}
                             >
                               <div className="flex items-center justify-center gap-3">
-                                <MessageCircle className="w-5 h-5" />
-                                <span>FINALIZAR RESERVA NO WHATSAPP</span>
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                <MessageCircle className="hidden sm:block w-5 h-5" />
+                                <span className="text-sm sm:text-base">FINALIZAR RESERVA</span>
+                                <ArrowRight className="hidden sm:block w-5 h-5 group-hover:translate-x-1 transition-transform" />
                               </div>
                             </motion.button>
 
                             {/* Security Info */}
                             <div className="border-t border-white/10" style={{ marginTop: 'var(--space-2)', paddingTop: 'var(--space-2)' }}>
-                              <div className="flex items-center justify-center gap-8 text-white/60 text-sm">
+                              <div className="flex items-center justify-center gap-4 sm:gap-8 text-white/60 text-xs sm:text-sm">
                                 <div className="flex items-center gap-3">
-                                  <Shield className="w-5 h-5 text-emerald-400" />
+                                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
                                   <span>100% Seguro</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                  <CheckCircle className="w-5 h-5 text-blue-400" />
+                                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
                                   <span>Sem Taxas</span>
                                 </div>
                               </div>
@@ -1245,6 +1345,728 @@ export default function PriceCalculatorSection() {
             </div>
           </div>
         </motion.section>
+
+        {/* Sophisticated Reservation Modal */}
+        <AnimatePresence>
+          {showReservationModal && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {/* Backdrop */}
+              <motion.div
+                className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setShowReservationModal(false)}
+              />
+              
+              {/* Modal Content */}
+              <motion.div
+                className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black border border-white/10 overflow-hidden w-full max-h-[95vh] overflow-y-auto"
+                style={{ 
+                  borderRadius: window.innerWidth <= 420 ? '16px' : '24px',
+                  maxWidth: window.innerWidth <= 420 ? '100%' : '64rem',
+                  margin: window.innerWidth <= 420 ? '0.5rem' : 'auto'
+                }}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              >
+                {/* Editorial Pattern Background */}
+                <motion.div 
+                  className="absolute inset-0 opacity-[0.02]"
+                  animate={{ 
+                    backgroundPosition: ['0% 0%', '100% 100%'],
+                  }}
+                  transition={{
+                    duration: 60,
+                    repeat: Infinity,
+                    ease: 'linear'
+                  }}
+                  style={{
+                    backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(45deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
+                    backgroundSize: 'var(--space-12) var(--space-12), var(--space-6) var(--space-6)'
+                  }}
+                />
+                
+                {/* Ambient Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/8 via-transparent to-emerald-500/8" />
+                
+                {/* Content */}
+                {/* Close Button */}
+                <motion.button
+                  className="absolute top-4 right-4 z-20 w-8 h-8 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-all duration-300"
+                  onClick={() => setShowReservationModal(false)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X className="w-4 h-4" />
+                </motion.button>
+                
+                <div className="relative z-10" style={{ 
+                  padding: window.innerWidth <= 420 ? '2.5rem 0.75rem 1rem 0.75rem' : 'var(--space-12)'
+                }}>
+                  {/* Editorial Header */}
+                  <motion.header
+                    className="editorial-rhythm text-center"
+                    style={{ marginBottom: 'var(--space-16)' }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
+                  >
+                    {/* Issue Badge */}
+                    <motion.div 
+                      className="inline-flex items-center bg-amber-500/15 border border-amber-500/25 text-amber-300 text-xs font-medium tracking-[0.25em] uppercase"
+                      style={{ 
+                        padding: 'var(--space-2) var(--space-4)',
+                        marginBottom: 'var(--space-6)',
+                        borderRadius: '20px'
+                      }}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                    >
+                      <span>ETAPA {modalStep} DE 2</span>
+                    </motion.div>
+                    
+                    {/* Editorial Headline */}
+                    <motion.h2 
+                      className="text-editorial-md text-white tracking-tighter"
+                      style={{ marginBottom: 'var(--space-4)' }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.8, delay: 0.4 }}
+                    >
+                      {modalStep === 1 ? (
+                        <>
+                          CONFIRME SUA{' '}
+                          <span className="text-transparent bg-gradient-to-r from-amber-400 via-amber-300 to-emerald-400 bg-clip-text">
+                            RESERVA
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          SEUS{' '}
+                          <span className="text-transparent bg-gradient-to-r from-emerald-400 via-emerald-300 to-amber-400 bg-clip-text">
+                            DADOS
+                          </span>
+                        </>
+                      )}
+                    </motion.h2>
+                    
+                    {/* Editorial Subtext */}
+                    <motion.p 
+                      className="text-lg text-white/75 max-w-2xl mx-auto font-light"
+                      style={{ lineHeight: '1.6' }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.8, delay: 0.6 }}
+                    >
+                      {modalStep === 1 
+                        ? 'Revise cuidadosamente todos os detalhes da sua reserva antes de prosseguir para a próxima etapa.'
+                        : 'Complete suas informações para que possamos finalizar sua reserva com total segurança.'
+                      }
+                    </motion.p>
+                    
+                    {/* Editorial Progress Indicator */}
+                    <motion.div 
+                      className="flex items-center justify-center"
+                      style={{ gap: 'var(--space-3)', marginTop: 'var(--space-8)' }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.8 }}
+                    >
+                      <div className={`w-4 h-4 rounded-full transition-all duration-500 ${modalStep >= 1 ? 'bg-gradient-to-r from-amber-400 to-amber-300 shadow-lg shadow-amber-400/30' : 'bg-white/20'}`} />
+                      <div className={`h-0.5 transition-all duration-500 ${modalStep >= 2 ? 'bg-gradient-to-r from-amber-400 to-emerald-400 w-16' : 'bg-white/20 w-12'}`} />
+                      <div className={`w-4 h-4 rounded-full transition-all duration-500 ${modalStep >= 2 ? 'bg-gradient-to-r from-emerald-400 to-emerald-300 shadow-lg shadow-emerald-400/30' : 'bg-white/20'}`} />
+                    </motion.div>
+                  </motion.header>
+                  
+                  {/* Content based on step */}
+                  {modalStep === 1 ? (
+                    /* Step 1: Editorial Reservation Summary */
+                    <div className="editorial-stack-lg">
+                      <motion.article 
+                        className="relative overflow-hidden"
+                        style={{ 
+                          padding: window.innerWidth <= 420 ? '1rem 0.5rem' : 'var(--space-10)',
+                          borderRadius: window.innerWidth <= 420 ? '16px' : '20px'
+                        }}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
+                        {/* Editorial Card Background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-white/4 to-white/6 backdrop-blur-sm border border-white/10" />
+                        
+                        {/* Subtle Pattern */}
+                        <div 
+                          className="absolute inset-0 opacity-[0.03]"
+                          style={{
+                            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.3) 1px, transparent 0)',
+                            backgroundSize: 'var(--space-6) var(--space-6)'
+                          }}
+                        />
+                        
+                        <div className="relative z-10">
+                          <h3 className="text-white font-bold tracking-tight text-center" style={{ 
+                            fontSize: window.innerWidth <= 420 ? '1.125rem' : 'clamp(1.125rem, 4vw, 2rem)',
+                            marginBottom: window.innerWidth <= 420 ? '1rem' : 'var(--space-8)'
+                          }}>
+                            Resumo da Reserva
+                          </h3>
+                        
+                          {/* Editorial Details Grid */}
+                          {/* Mobile-First Simple Layout */}
+                          <div style={{ 
+                            display: window.innerWidth <= 420 ? 'block' : 'grid',
+                            gridTemplateColumns: window.innerWidth <= 420 ? '1fr' : '1fr 1fr',
+                            gap: window.innerWidth <= 420 ? '0.75rem' : 'var(--space-8)'
+                          }}>
+                            {/* Unified Details List - Mobile Optimized */}
+                            <div style={{ 
+                              display: 'flex', 
+                              flexDirection: 'column',
+                              gap: window.innerWidth <= 420 ? '0.5rem' : '0.75rem'
+                            }}>
+                              {[
+                                { label: window.innerWidth <= 420 ? 'Categoria' : 'Categoria do Veículo', value: selectedCategory, icon: Car, color: 'amber' },
+                                { label: window.innerWidth <= 420 ? 'Passageiros' : 'Número de Passageiros', value: `${passengers} ${passengers === 1 ? 'pessoa' : 'pessoas'}`, icon: Users, color: 'amber' },
+                                { label: window.innerWidth <= 420 ? 'Período' : 'Período da Locação', value: `${days} ${days === 1 ? 'dia' : 'dias'}`, icon: Clock, color: 'amber' },
+                                { label: window.innerWidth <= 420 ? 'Retirada' : 'Data de Retirada', value: new Date(checkInDate + 'T12:00:00').toLocaleDateString('pt-BR'), icon: Calendar, color: 'emerald' },
+                                { label: window.innerWidth <= 420 ? 'Devolução' : 'Data de Devolução', value: new Date(checkOutDate + 'T12:00:00').toLocaleDateString('pt-BR'), icon: Calendar, color: 'emerald' },
+                                { label: window.innerWidth <= 420 ? 'Diária' : 'Valor da Diária', value: window.innerWidth <= 420 ? `$${daily.toFixed(2)}` : `$${daily.toFixed(2)} USD`, icon: CreditCard, color: 'emerald' }
+                              ].map((item, index) => {
+                                const Icon = item.icon;
+                                const colorClass = item.color === 'amber' ? 'text-amber-400' : 'text-emerald-400';
+                                
+                                return (
+                                  <div key={index} className="flex items-center justify-between bg-white/5 border border-white/10" style={{ 
+                                    padding: window.innerWidth <= 420 ? '0.75rem' : '0.75rem 1rem',
+                                    borderRadius: window.innerWidth <= 420 ? '8px' : '12px',
+                                    minHeight: window.innerWidth <= 420 ? '40px' : '48px'
+                                  }}>
+                                    <div className="flex items-center" style={{ gap: window.innerWidth <= 420 ? '0.75rem' : '0.75rem' }}>
+                                      <Icon className={colorClass} style={{ 
+                                        width: window.innerWidth <= 420 ? '12px' : '16px', 
+                                        height: window.innerWidth <= 420 ? '12px' : '16px' 
+                                      }} />
+                                      <span className="text-white/70 font-medium" style={{
+                                        fontSize: window.innerWidth <= 420 ? '0.8rem' : '0.875rem'
+                                      }}>{item.label}</span>
+                                    </div>
+                                    <span className="text-white font-semibold" style={{
+                                      fontSize: window.innerWidth <= 420 ? '0.875rem' : '1rem'
+                                    }}>{item.value}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            
+                            {/* Desktop: Add spacing column */}
+                            {window.innerWidth > 420 && <div></div>}
+                          </div>
+                          
+                          {/* Editorial Total Section */}
+                          <div className="bg-gradient-to-r from-emerald-500/15 to-emerald-400/10 border-2 border-emerald-400/30" style={{ 
+                            marginTop: window.innerWidth <= 420 ? '0.75rem' : 'clamp(1rem, 4vw, 2rem)', 
+                            padding: window.innerWidth <= 420 ? '0.75rem' : 'clamp(1rem, 4vw, 1.5rem)', 
+                            borderRadius: window.innerWidth <= 420 ? '12px' : '16px' 
+                          }}>
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-emerald-300 font-bold uppercase tracking-wide" style={{
+                                  fontSize: window.innerWidth <= 420 ? '0.875rem' : 'clamp(1rem, 4vw, 1.5rem)'
+                                }}>{window.innerWidth <= 420 ? 'Total' : 'Total da Reserva'}</div>
+                                <div className="text-white/60" style={{
+                                  fontSize: window.innerWidth <= 420 ? '0.65rem' : 'clamp(0.75rem, 2.5vw, 0.875rem)'
+                                }}>{window.innerWidth <= 420 ? 'Pague só ao receber' : 'Pagamento apenas após receber o veículo'}</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-emerald-300 font-black" style={{
+                                  fontSize: window.innerWidth <= 420 ? '1.5rem' : 'clamp(1.5rem, 6vw, 2.5rem)'
+                                }}>${total.toFixed(2)}</div>
+                                <div className="text-white/50" style={{
+                                  fontSize: 'clamp(0.75rem, 2.5vw, 0.875rem)'
+                                }}>USD</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.article>
+                    </div>
+                  ) : (
+                    /* Step 2: Editorial Client Form */
+                    <div className="editorial-stack-lg">
+                      <motion.article 
+                        className="relative overflow-hidden"
+                        style={{ 
+                          padding: window.innerWidth <= 420 ? '1rem 0.5rem' : 'var(--space-10)',
+                          borderRadius: window.innerWidth <= 420 ? '16px' : '20px'
+                        }}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
+                        {/* Editorial Form Background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-white/4 to-white/6 backdrop-blur-sm border border-white/10" />
+                        
+                        <div className="relative z-10">
+                          <h3 className="text-white font-bold tracking-tight flex items-center" style={{ 
+                            fontSize: window.innerWidth <= 420 ? '1rem' : 'clamp(1.125rem, 4vw, 1.5rem)',
+                            gap: window.innerWidth <= 420 ? '0.5rem' : 'var(--space-3)', 
+                            marginBottom: window.innerWidth <= 420 ? '1rem' : 'var(--space-8)'
+                          }}>
+                            <div className="bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl flex items-center justify-center" style={{
+                              width: window.innerWidth <= 420 ? '28px' : '40px',
+                              height: window.innerWidth <= 420 ? '28px' : '40px'
+                            }}>
+                              <Users className="text-black" style={{ 
+                                width: window.innerWidth <= 420 ? '14px' : '20px', 
+                                height: window.innerWidth <= 420 ? '14px' : '20px' 
+                              }} />
+                            </div>
+                            Informações de Contato
+                          </h3>
+                        
+                          {/* Editorial Form Fields */}
+                          <div className="editorial-stack-lg">
+                            {[
+                              { label: 'Nome Completo', type: 'text', value: clientName, setter: setClientName, placeholder: 'Digite seu nome completo', required: true },
+                              { label: 'WhatsApp', type: 'tel', value: clientPhone, setter: setClientPhone, placeholder: '(11) 99999-9999', required: true },
+                              { label: 'E-mail', type: 'email', value: clientEmail, setter: setClientEmail, placeholder: 'seu@email.com', required: true }
+                            ].map((field, index) => (
+                              <div key={index} className="editorial-stack-sm">
+                                <label className="block text-white/80 font-medium tracking-wide">
+                                  {field.label} {field.required && <span className="text-amber-400">*</span>}
+                                </label>
+                                <input
+                                  type={field.type}
+                                  value={field.value}
+                                  onChange={(e) => field.setter(e.target.value)}
+                                  className="w-full bg-white/8 backdrop-blur-sm border border-white/15 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400/50 focus:bg-white/12 transition-all duration-300"
+                                  style={{ 
+                                    padding: 'var(--space-4) var(--space-5)',
+                                    borderRadius: '12px',
+                                    fontSize: '16px'
+                                  }}
+                                  placeholder={field.placeholder}
+                                />
+                              </div>
+                            ))}
+                            
+                            {/* Car Seat Section */}
+                            <div className="editorial-stack-sm">
+                              <label className="block text-white/80 font-medium tracking-wide" style={{
+                                fontSize: window.innerWidth <= 420 ? '0.75rem' : '1rem',
+                                marginBottom: window.innerWidth <= 420 ? '0.5rem' : '0.75rem'
+                              }}>
+                                Precisa de cadeirinha para criança?
+                              </label>
+                              
+                              {/* Car Seat Toggle */}
+                              <div className="flex items-center" style={{ gap: window.innerWidth <= 420 ? '0.75rem' : '1rem', marginBottom: window.innerWidth <= 420 ? '0.75rem' : '1rem' }}>
+                                <motion.button
+                                  type="button"
+                                  onClick={() => setNeedsCarSeat(true)}
+                                  className={`relative inline-flex items-center justify-center font-medium transition-all duration-300 ${
+                                    needsCarSeat 
+                                      ? 'bg-emerald-500 text-white border-2 border-emerald-500' 
+                                      : 'bg-white/8 text-white/70 border border-white/20 hover:bg-white/12'
+                                  }`}
+                                  style={{
+                                    padding: window.innerWidth <= 420 ? '0.5rem 1rem' : '0.75rem 1.25rem',
+                                    borderRadius: window.innerWidth <= 420 ? '6px' : '8px',
+                                    fontSize: window.innerWidth <= 420 ? '0.75rem' : '0.875rem',
+                                    minHeight: window.innerWidth <= 420 ? '36px' : '44px'
+                                  }}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  {needsCarSeat ? '✓ Sim' : 'Sim'}
+                                </motion.button>
+                                
+                                <motion.button
+                                  type="button"
+                                  onClick={() => setNeedsCarSeat(false)}
+                                  className={`relative inline-flex items-center justify-center font-medium transition-all duration-300 ${
+                                    !needsCarSeat 
+                                      ? 'bg-emerald-500 text-white border-2 border-emerald-500' 
+                                      : 'bg-white/8 text-white/70 border border-white/20 hover:bg-white/12'
+                                  }`}
+                                  style={{
+                                    padding: window.innerWidth <= 420 ? '0.5rem 1rem' : '0.75rem 1.25rem',
+                                    borderRadius: window.innerWidth <= 420 ? '6px' : '8px',
+                                    fontSize: window.innerWidth <= 420 ? '0.75rem' : '0.875rem',
+                                    minHeight: window.innerWidth <= 420 ? '36px' : '44px'
+                                  }}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  {!needsCarSeat ? '✓ Não' : 'Não'}
+                                </motion.button>
+                              </div>
+                              
+                              {/* Quantity Selector - Only show if needsCarSeat is true */}
+                              <AnimatePresence>
+                                {needsCarSeat && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                  >
+                                    <label className="block text-white/70 font-medium" style={{
+                                      fontSize: window.innerWidth <= 420 ? '0.7rem' : '0.8rem',
+                                      marginBottom: window.innerWidth <= 420 ? '0.375rem' : '0.5rem',
+                                      marginTop: window.innerWidth <= 420 ? '0.5rem' : '0.75rem'
+                                    }}>
+                                      Quantas cadeirinhas?
+                                    </label>
+                                    <div className="flex items-center" style={{ gap: window.innerWidth <= 420 ? '0.5rem' : '0.75rem' }}>
+                                      <motion.button
+                                        type="button"
+                                        onClick={() => setCarSeatQuantity(Math.max(1, carSeatQuantity - 1))}
+                                        className="bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg flex items-center justify-center text-white transition-all duration-300"
+                                        style={{
+                                          width: window.innerWidth <= 420 ? '32px' : '36px',
+                                          height: window.innerWidth <= 420 ? '32px' : '36px',
+                                          fontSize: window.innerWidth <= 420 ? '0.875rem' : '1rem'
+                                        }}
+                                        disabled={carSeatQuantity <= 1}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                      >
+                                        -
+                                      </motion.button>
+                                      
+                                      <span className="text-white font-semibold" style={{
+                                        fontSize: window.innerWidth <= 420 ? '1rem' : '1.125rem',
+                                        minWidth: window.innerWidth <= 420 ? '32px' : '40px',
+                                        textAlign: 'center'
+                                      }}>
+                                        {carSeatQuantity}
+                                      </span>
+                                      
+                                      <motion.button
+                                        type="button"
+                                        onClick={() => setCarSeatQuantity(Math.min(4, carSeatQuantity + 1))}
+                                        className="bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg flex items-center justify-center text-white transition-all duration-300"
+                                        style={{
+                                          width: window.innerWidth <= 420 ? '32px' : '36px',
+                                          height: window.innerWidth <= 420 ? '32px' : '36px',
+                                          fontSize: window.innerWidth <= 420 ? '0.875rem' : '1rem'
+                                        }}
+                                        disabled={carSeatQuantity >= 4}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                      >
+                                        +
+                                      </motion.button>
+                                      
+                                      <span className="text-white/60" style={{
+                                        fontSize: window.innerWidth <= 420 ? '0.7rem' : '0.75rem',
+                                        marginLeft: window.innerWidth <= 420 ? '0.5rem' : '0.75rem'
+                                      }}>
+                                        (máx. 4)
+                                      </span>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          </div>
+                        
+                          {/* Editorial Security Notice */}
+                          <motion.div 
+                            className="bg-gradient-to-r from-amber-500/10 to-amber-400/5 border border-amber-400/25 backdrop-blur-sm"
+                            style={{ 
+                              marginTop: window.innerWidth <= 420 ? '0.75rem' : 'var(--space-8)',
+                              padding: window.innerWidth <= 420 ? '1rem' : 'var(--space-6)',
+                              borderRadius: '16px'
+                            }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                          >
+                            <div className="flex items-start" style={{ gap: window.innerWidth <= 420 ? '0.75rem' : 'var(--space-4)' }}>
+                              <div className="bg-amber-400/20 rounded-lg flex items-center justify-center flex-shrink-0" style={{
+                                width: window.innerWidth <= 420 ? '28px' : '32px',
+                                height: window.innerWidth <= 420 ? '28px' : '32px'
+                              }}>
+                                <Shield className="text-amber-300" style={{
+                                  width: window.innerWidth <= 420 ? '14px' : '16px',
+                                  height: window.innerWidth <= 420 ? '14px' : '16px'
+                                }} />
+                              </div>
+                              <div>
+                                <h4 className="text-amber-200 font-semibold tracking-wide" style={{ 
+                                  fontSize: window.innerWidth <= 420 ? '0.875rem' : '1rem',
+                                  marginBottom: window.innerWidth <= 420 ? '0.375rem' : 'var(--space-1)',
+                                  lineHeight: '1.3'
+                                }}>
+                                  Seus dados estão protegidos
+                                </h4>
+                                <p className="text-amber-200/75 leading-relaxed" style={{
+                                  fontSize: window.innerWidth <= 420 ? '0.75rem' : '0.875rem',
+                                  lineHeight: window.innerWidth <= 420 ? '1.4' : '1.5'
+                                }}>
+                                  Utilizamos suas informações exclusivamente para processar sua reserva e manter contato sobre seu aluguel. Seus dados são tratados com total segurança e confidencialidade.
+                                </p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        </div>
+                      </motion.article>
+                    </div>
+                  )}
+                  
+                  {/* Editorial Benefits Section */}
+                  <motion.article 
+                    className="relative overflow-hidden"
+                    style={{ 
+                      padding: 'var(--space-8)',
+                      borderRadius: '20px',
+                      marginTop: 'var(--space-10)'
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.6 }}
+                  >
+                    {/* Benefits Background */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/12 to-emerald-400/8 border border-emerald-400/25" />
+                    
+                    <div className="relative z-10">
+                      <h3 className="text-title text-emerald-300 font-bold tracking-tight flex items-center" style={{ gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
+                        <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-emerald-300 rounded-lg flex items-center justify-center">
+                          <Shield className="w-4 h-4 text-black" />
+                        </div>
+                        Seus Benefícios ASX
+                      </h3>
+                      
+                      <div className="magazine-grid" style={{ gap: 'var(--space-4)' }}>
+                        {[
+                          { text: 'Pagamento só após receber o veículo', icon: CreditCard },
+                          { text: 'Zero bloqueio no cartão de crédito', icon: Shield },
+                          { text: 'Quilometragem 100% ilimitada', icon: CheckCircle },
+                          { text: 'Suporte 24/7 em português', icon: MessageCircle }
+                        ].map((benefit, index) => {
+                          const Icon = benefit.icon;
+                          return (
+                            <div key={index} className="col-span-12 lg:col-span-6">
+                              <div className="flex items-center" style={{ gap: 'var(--space-3)' }}>
+                                <div className="w-6 h-6 bg-emerald-400/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                  <Icon className="w-3 h-3 text-emerald-300" />
+                                </div>
+                                <span className="text-white/85 font-medium text-sm">{benefit.text}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </motion.article>
+                  
+                  {/* Editorial Action Buttons */}
+                  <motion.div 
+                    className="flex flex-col lg:flex-row"
+                    style={{ gap: 'var(--space-4)', marginTop: 'var(--space-12)' }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.8 }}
+                  >
+                    {/* Secondary Button */}
+                    <motion.button
+                      onClick={modalStep === 1 ? () => setShowReservationModal(false) : backToSummary}
+                      className="group relative bg-white/8 backdrop-blur-sm border border-white/20 text-white font-semibold tracking-wide uppercase overflow-hidden transition-all duration-400"
+                      style={{ 
+                        padding: 'clamp(0.75rem, 3vw, 1rem) clamp(1.5rem, 5vw, 2rem)',
+                        borderRadius: '12px',
+                        fontSize: 'clamp(0.75rem, 3vw, 0.875rem)',
+                        letterSpacing: '0.1em',
+                        minHeight: 'clamp(44px, 12vw, 56px)'
+                      }}
+                      whileHover={{ 
+                        scale: 1.02,
+                        backgroundColor: 'rgba(255,255,255,0.15)',
+                        transition: { type: 'spring', stiffness: 400, damping: 17 }
+                      }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span className="relative z-10">{modalStep === 1 ? 'Cancelar' : 'Voltar'}</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                    </motion.button>
+                    
+                    {/* Primary CTA Button */}
+                    <motion.button
+                      onClick={modalStep === 1 ? proceedToClientData : sendToWhatsApp}
+                      disabled={modalStep === 2 && !validateClientData()}
+                      className={`group relative font-bold tracking-wide uppercase overflow-hidden transition-all duration-400 flex items-center justify-center cursor-pointer flex-1 ${
+                        modalStep === 2 && !validateClientData()
+                          ? 'bg-gray-700 border border-gray-600 text-gray-400 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400 hover:from-emerald-500 hover:via-emerald-400 hover:to-emerald-300 text-white shadow-lg shadow-emerald-500/25'
+                      }`}
+                      style={{ 
+                        padding: 'clamp(1rem, 4vw, 1.25rem) clamp(2rem, 6vw, 2.5rem)',
+                        borderRadius: '12px',
+                        fontSize: 'clamp(0.875rem, 3.5vw, 1rem)',
+                        letterSpacing: '0.1em',
+                        gap: 'clamp(0.5rem, 2vw, 0.75rem)',
+                        minHeight: 'clamp(50px, 14vw, 64px)'
+                      }}
+                      whileHover={modalStep === 2 && !validateClientData() ? {} : { 
+                        scale: 1.02,
+                        y: -2,
+                        boxShadow: '0 12px 40px rgba(16, 185, 129, 0.4)',
+                        transition: { type: 'spring', stiffness: 400, damping: 17 }
+                      }}
+                      whileTap={modalStep === 2 && !validateClientData() ? {} : { scale: 0.98 }}
+                    >
+                      {modalStep === 1 ? (
+                        <>
+                          <span className="relative z-10 font-black">Continuar</span>
+                          <ArrowRight className="relative z-10 group-hover:translate-x-1 transition-transform" style={{ width: 'clamp(16px, 4vw, 20px)', height: 'clamp(16px, 4vw, 20px)' }} />
+                        </>
+                      ) : (
+                        <>
+                          <MessageCircle className="relative z-10" style={{ width: 'clamp(16px, 4vw, 20px)', height: 'clamp(16px, 4vw, 20px)' }} />
+                          <span className="relative z-10 font-black">Finalizar no WhatsApp</span>
+                        </>
+                      )}
+                      {!(modalStep === 2 && !validateClientData()) && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
+                      )}
+                    </motion.button>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {/* Success Toast */}
+        <AnimatePresence>
+          {showSuccessToast && (
+            <motion.div
+              className="fixed top-8 left-1/2 transform -translate-x-1/2 z-[100] pointer-events-none"
+              initial={{ opacity: 0, y: -50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -50, scale: 0.9 }}
+              transition={{ 
+                type: 'spring', 
+                stiffness: 500, 
+                damping: 30,
+                duration: 0.4 
+              }}
+            >
+              <div className="bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400 border border-emerald-400/30 backdrop-blur-md shadow-2xl" style={{
+                borderRadius: '16px',
+                padding: window.innerWidth <= 420 ? '1rem 1.5rem' : '1.25rem 2rem',
+                maxWidth: window.innerWidth <= 420 ? '320px' : '480px',
+                boxShadow: '0 20px 40px rgba(16, 185, 129, 0.3), 0 8px 16px rgba(16, 185, 129, 0.2)'
+              }}>
+                {/* Animated Background Pattern */}
+                <motion.div 
+                  className="absolute inset-0 opacity-10"
+                  animate={{ 
+                    backgroundPosition: ['0% 0%', '100% 100%'],
+                  }}
+                  transition={{
+                    duration: 15,
+                    repeat: Infinity,
+                    ease: 'linear'
+                  }}
+                  style={{
+                    backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.6) 1px, transparent 0)',
+                    backgroundSize: '24px 24px',
+                    borderRadius: '16px'
+                  }}
+                />
+                
+                <div className="relative z-10 flex items-start" style={{ gap: window.innerWidth <= 420 ? '0.75rem' : '1rem' }}>
+                  {/* Success Icon */}
+                  <motion.div
+                    className="flex-shrink-0 bg-white/20 rounded-full flex items-center justify-center"
+                    style={{
+                      width: window.innerWidth <= 420 ? '40px' : '48px',
+                      height: window.innerWidth <= 420 ? '40px' : '48px'
+                    }}
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+                  >
+                    <CheckCircle className="text-white" style={{
+                      width: window.innerWidth <= 420 ? '20px' : '24px',
+                      height: window.innerWidth <= 420 ? '20px' : '24px'
+                    }} />
+                  </motion.div>
+                  
+                  {/* Success Content */}
+                  <div className="flex-1">
+                    <motion.h3 
+                      className="text-white font-bold tracking-tight"
+                      style={{
+                        fontSize: window.innerWidth <= 420 ? '1rem' : '1.125rem',
+                        marginBottom: window.innerWidth <= 420 ? '0.25rem' : '0.375rem'
+                      }}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      Reserva Enviada com Sucesso!
+                    </motion.h3>
+                    
+                    <motion.p 
+                      className="text-emerald-50/90 font-medium leading-relaxed"
+                      style={{
+                        fontSize: window.innerWidth <= 420 ? '0.8rem' : '0.875rem',
+                        lineHeight: '1.4'
+                      }}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      Nosso especialista entrará em contato em breve com todos os detalhes da sua reserva.
+                    </motion.p>
+                    
+                    {/* Progress Bar */}
+                    <motion.div 
+                      className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <motion.div 
+                        className="h-full bg-white/60 rounded-full"
+                        initial={{ width: '100%' }}
+                        animate={{ width: '0%' }}
+                        transition={{ duration: 4, ease: 'linear' }}
+                      />
+                    </motion.div>
+                  </div>
+                  
+                  {/* Close Button */}
+                  <motion.button
+                    className="flex-shrink-0 w-6 h-6 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-all duration-300 pointer-events-auto"
+                    onClick={() => setShowSuccessToast(false)}
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <X className="w-3 h-3" />
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

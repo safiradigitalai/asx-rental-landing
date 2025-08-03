@@ -307,6 +307,17 @@ body {
   }
 }
 
+/* Ultra Small Mobile - 420px and below */
+@media (max-width: 420px) {
+  :root {
+    /* Extra compact spacing for very small screens */
+    --space-2: 0.75rem; /* 12px */
+    --space-3: 1rem;    /* 16px */
+    --space-4: 1.25rem; /* 20px */
+    --space-6: 1.5rem;  /* 24px */
+  }
+}
+
 /* Editorial Layout Utilities */
 .magazine-grid {
   display: grid;

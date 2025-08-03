@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 
 interface Testimonial {
   id: number;
@@ -159,7 +159,8 @@ export default function TestimonialsSection() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <span>Depoimentos Verificados</span>
+              <MessageSquare className="w-4 h-4" />
+              <span>Depoimentos</span>
             </motion.div>
             
             {/* Editorial Headline */}
@@ -405,8 +406,8 @@ export default function TestimonialsSection() {
             <motion.article 
               className="relative overflow-hidden text-center"
               style={{ 
-                padding: 'var(--space-10)',
-                borderRadius: '20px'
+                padding: 'clamp(1rem, 4vw, var(--space-10))',
+                borderRadius: 'clamp(16px, 4vw, 20px)'
               }}
               whileHover={{ 
                 scale: 1.01,
@@ -439,8 +440,11 @@ export default function TestimonialsSection() {
               <div className="relative z-10 text-white">
                 {/* Title */}
                 <motion.h3 
-                  className="text-editorial-md leading-tight" 
-                  style={{ marginBottom: 'var(--space-4)' }}
+                  className="leading-tight" 
+                  style={{ 
+                    fontSize: 'clamp(1.5rem, 6vw, 4rem)',
+                    marginBottom: 'clamp(0.75rem, 2vw, var(--space-4))'
+                  }}
                 >
                   PRONTO PARA CRIAR{' '}
                   <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text">
@@ -449,11 +453,13 @@ export default function TestimonialsSection() {
                 </motion.h3>
                 
                 {/* Description */}
-                <p className="text-xl text-white/85 font-light" style={{ 
-                  lineHeight: 'var(--baseline)', 
-                  marginBottom: 'var(--space-8)',
-                  maxWidth: '600px',
-                  margin: '0 auto var(--space-8) auto'
+                <p className="text-white/85 font-light" style={{ 
+                  fontSize: 'clamp(0.875rem, 3vw, 1.25rem)',
+                  lineHeight: 'clamp(1.4, 0.2vw, var(--baseline))', 
+                  marginBottom: 'clamp(1rem, 3vw, var(--space-8))',
+                  maxWidth: 'clamp(100%, 10vw, 600px)',
+                  margin: '0 auto clamp(1rem, 3vw, var(--space-8)) auto',
+                  padding: 'clamp(0px, 1vw, 0px) clamp(0.5rem, 2vw, 0px)'
                 }}>
                   Junte-se a milhares de brasileiros que já escolheram a ASX para suas aventuras em Orlando.
                 </p>
@@ -462,8 +468,9 @@ export default function TestimonialsSection() {
                 <motion.button
                   className="inline-flex items-center bg-amber-500 hover:bg-amber-400 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden"
                   style={{ 
-                    padding: 'var(--space-4) var(--space-10)',
-                    borderRadius: '8px'
+                    padding: 'clamp(0.875rem, 3vw, var(--space-4)) clamp(1.25rem, 5vw, var(--space-10))',
+                    borderRadius: '8px',
+                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)'
                   }}
                   onClick={() => scrollToSection('calculadora')}
                   whileHover={{ 
@@ -473,7 +480,10 @@ export default function TestimonialsSection() {
                   }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <span className="relative z-10">Começar Minha Aventura</span>
+                  <span className="relative z-10">
+                    <span className="hidden xs:inline">Começar Minha Aventura</span>
+                    <span className="xs:hidden">Começar Aventura</span>
+                  </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                 </motion.button>
               </div>

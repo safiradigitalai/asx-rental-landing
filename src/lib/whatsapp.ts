@@ -60,19 +60,19 @@ Gostaria de informações sobre:
 Aguardo contato!`;
 
 export const createCalculadoraMessage = (dias: number, categoria: string, passageiros: number) => 
-  `💰 Olá! Fiz uma simulação na calculadora da ASX Rental:
+  `🚗 Olá! Gostaria de finalizar minha reserva pela ASX Rental:
 
-📊 *Minha Simulação:*
-• ${dias} dias de aluguel
+📋 *Detalhes da Reserva:*
+• ${dias} dias de locação
 • Categoria: ${categoria}
-• ${passageiros} passageiros
+• ${passageiros} ${passageiros === 1 ? 'pessoa' : 'pessoas'}
 
-Gostaria de:
-• Confirmar esse preço
-• Fazer a reserva
-• Saber sobre o pagamento só após receber
+Preciso de:
+• Confirmação da disponibilidade
+• Detalhes do processo de reserva
+• Informações sobre pagamento após receber
 
-Podem me ajudar?`;
+Aguardo o contato para finalizar! 🙌`;
 
 export const whatsappMessages = {
   hero: `🚗 Olá! Vi a landing page da ASX Rental e gostaria de alugar um carro em Orlando.

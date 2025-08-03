@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Users, Star, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, Star, ArrowRight, ChevronLeft, ChevronRight, Car } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { openWhatsAppMessage } from '@/lib/whatsapp';
 
@@ -282,6 +282,7 @@ export default function VehicleCategoriesSection() {
             <motion.div 
               className="inline-flex items-center bg-amber-500/10 border border-amber-500/20 text-amber-700 text-sm font-medium tracking-[0.2em] uppercase"
               style={{ 
+                gap: 'var(--space-2)',
                 padding: 'var(--space-2) var(--space-4)',
                 marginBottom: 'var(--space-8)'
               }}
@@ -289,6 +290,7 @@ export default function VehicleCategoriesSection() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
+              <Car className="w-4 h-4" />
               <span>Frota ASX</span>
             </motion.div>
             
@@ -767,7 +769,7 @@ export default function VehicleCategoriesSection() {
                 
                 {/* Editorial Description */}
                 <p className="text-xl text-white/85 font-light" style={{ 
-                  lineHeight: 'var(--baseline)', 
+                  lineHeight: '1.8', 
                   marginBottom: 'var(--space-10)',
                   maxWidth: '600px',
                   margin: '0 auto var(--space-10) auto'
