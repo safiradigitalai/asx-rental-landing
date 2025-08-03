@@ -27,6 +27,7 @@ export default function PriceCalculatorSection() {
   const [step, setStep] = useState(1);
   const [isCalculating, setIsCalculating] = useState(false);
   const [showQuickDates, setShowQuickDates] = useState(false);
+  const [showAllCategories, setShowAllCategories] = useState(false);
 
   // Quick date suggestions
   const quickDateOptions = [
@@ -78,21 +79,24 @@ export default function PriceCalculatorSection() {
       name: 'Sedan', 
       description: 'Ideal para casais e viagens econômicas',
       passengers: '1-4 pessoas',
-      features: ['Econômico', 'Fácil estacionamento', 'Baixo consumo']
+      features: ['Econômico', 'Fácil estacionamento', 'Baixo consumo'],
+      popular: true
     },
     { 
       key: 'Minivan Regular' as const, 
       name: 'Minivan Regular', 
       description: 'Perfeita para famílias pequenas',
       passengers: '5-7 pessoas',
-      features: ['Espaçosa', 'Confortável', 'Bagageiro amplo']
+      features: ['Espaçosa', 'Confortável', 'Bagageiro amplo'],
+      popular: true
     },
     { 
       key: 'Minivan Luxo' as const, 
       name: 'Minivan Luxo', 
       description: 'Máximo conforto para grupos',
       passengers: '5-8 pessoas',
-      features: ['Premium', 'Couro', 'Entretenimento']
+      features: ['Premium', 'Couro', 'Entretenimento'],
+      popular: true
     },
     { 
       key: 'SUV' as const, 
@@ -116,6 +120,11 @@ export default function PriceCalculatorSection() {
       features: ['Topo de linha', 'Tecnologia avançada', 'Máximo luxo']
     }
   ];
+
+  // Filter categories for display
+  const popularCategories = categories.filter(cat => cat.popular);
+  const otherCategories = categories.filter(cat => !cat.popular);
+  const categoriesToShow = showAllCategories ? categories : popularCategories;
 
   // Handle quick date selection
   const handleQuickDate = (days: number) => {
@@ -208,7 +217,8 @@ export default function PriceCalculatorSection() {
               className="inline-flex items-center bg-amber-500/10 border border-amber-500/20 text-amber-700 text-sm font-medium tracking-[0.2em] uppercase"
               style={{ 
                 gap: 'var(--space-2)', 
-                padding: 'var(--space-2) var(--space-4)'
+                padding: 'var(--space-2) var(--space-4)',
+                marginBottom: 'var(--space-8)'
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -220,7 +230,7 @@ export default function PriceCalculatorSection() {
             
             {/* Editorial Headline */}
             <motion.h2 
-              className="text-editorial-lg text-gray-900 tracking-tighter"
+              className="text-editorial-md text-gray-900 tracking-tighter"
               style={{ marginBottom: 'var(--space-2)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -235,7 +245,7 @@ export default function PriceCalculatorSection() {
             {/* Editorial Subtext */}
             <motion.p 
               className="text-xl text-gray-600 max-w-3xl mx-auto font-light"
-              style={{ lineHeight: 'var(--baseline)', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}
+              style={{ lineHeight: '1.7', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -347,8 +357,11 @@ export default function PriceCalculatorSection() {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                        {categories.map((category, index) => (
+                      {/* Categories Display */}
+                      <div className="space-y-8">
+                        {/* Desktop - Always show all */}
+                        <div className="hidden lg:grid lg:grid-cols-3 xl:grid-cols-3 gap-8">
+                          {categories.map((category, index) => (
                           <motion.button
                             key={category.key}
                             className={`relative overflow-hidden transition-all duration-300 text-left group ${
@@ -428,6 +441,239 @@ export default function PriceCalculatorSection() {
                             )}
                           </motion.button>
                         ))}
+                        </div>
+                        
+                        {/* Mobile - Accordion */}
+                        <div className="lg:hidden">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {popularCategories.map((category, index) => (
+                            <motion.button
+                              key={category.key}
+                              className={`relative overflow-hidden transition-all duration-300 text-left group ${
+                                selectedCategory === category.key
+                                  ? 'bg-gradient-to-br from-amber-500/15 to-amber-400/8 border-2 border-amber-400/50 text-white'
+                                  : 'bg-white/4 border border-white/15 text-white/85 hover:bg-white/8 hover:border-white/30'
+                              }`}
+                              style={{ 
+                                padding: '2rem', 
+                                borderRadius: '16px',
+                                minHeight: '200px'
+                              }}
+                              onClick={() => setSelectedCategory(category.key)}
+                              whileHover={{ 
+                                scale: 1.01,
+                                y: -2,
+                                transition: { type: 'spring', stiffness: 400, damping: 20 }
+                              }}
+                              whileTap={{ scale: 0.99 }}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.5, delay: index * 0.08 }}
+                            >
+                              {/* Price Header */}
+                              <div className="flex items-start justify-between mb-6">
+                                <div className={`w-3 h-3 rounded-full transition-all duration-300 mt-1 ${
+                                  selectedCategory === category.key ? 'bg-amber-400' : 'bg-white/30'
+                                }`} />
+                                <div className={`text-right ${
+                                  selectedCategory === category.key ? 'text-amber-300' : 'text-white/70'
+                                }`}>
+                                  <div className="text-2xl font-bold tracking-tight">
+                                    ${dailyPrices[category.key]}
+                                  </div>
+                                  <div className="text-xs font-light mt-1 opacity-80">/dia</div>
+                                </div>
+                              </div>
+                              
+                              {/* Content */}
+                              <div className="space-y-4">
+                                <div>
+                                  <h4 className="font-bold text-lg mb-2 tracking-tight">
+                                    {category.name}
+                                  </h4>
+                                  <p className="text-sm text-white/70 font-light leading-relaxed mb-3">
+                                    {category.description}
+                                  </p>
+                                  <div className="text-xs text-amber-300/80 font-medium">
+                                    <Users className="w-3 h-3 inline mr-1" />
+                                    {category.passengers}
+                                  </div>
+                                </div>
+                                
+                                {/* Features */}
+                                <div className="flex flex-wrap gap-2">
+                                  {category.features.map((feature, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="text-xs bg-white/8 text-white/70 px-2 py-1 rounded-md font-light"
+                                    >
+                                      {feature}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              {/* Selection Indicator */}
+                              {selectedCategory === category.key && (
+                                <motion.div 
+                                  className="absolute top-4 right-4 w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                                >
+                                  <CheckCircle className="w-4 h-4 text-black" />
+                                </motion.div>
+                              )}
+                            </motion.button>
+                          ))}
+                          </div>
+                          
+                          {/* Additional Categories - Animated */}
+                          <AnimatePresence>
+                            {showAllCategories && (
+                              <motion.div 
+                                className="grid grid-cols-1 md:grid-cols-2 gap-8"
+                                style={{ marginTop: 'var(--space-8)' }}
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ 
+                                  duration: 0.5,
+                                  ease: [0.4, 0.0, 0.2, 1],
+                                  opacity: { duration: 0.3 },
+                                  height: { duration: 0.5 }
+                                }}
+                              >
+                                {otherCategories.map((category, index) => (
+                                  <motion.button
+                                    key={category.key}
+                                    className={`relative overflow-hidden transition-all duration-300 text-left group ${
+                                      selectedCategory === category.key
+                                        ? 'bg-gradient-to-br from-amber-500/15 to-amber-400/8 border-2 border-amber-400/50 text-white'
+                                        : 'bg-white/4 border border-white/15 text-white/85 hover:bg-white/8 hover:border-white/30'
+                                    }`}
+                                    style={{ 
+                                      padding: '2rem', 
+                                      borderRadius: '16px',
+                                      minHeight: '200px'
+                                    }}
+                                    onClick={() => setSelectedCategory(category.key)}
+                                    whileHover={{ 
+                                      scale: 1.01,
+                                      y: -2,
+                                      transition: { type: 'spring', stiffness: 400, damping: 20 }
+                                    }}
+                                    whileTap={{ scale: 0.99 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: index * 0.08 }}
+                                  >
+                                    {/* Price Header */}
+                                    <div className="flex items-start justify-between mb-6">
+                                      <div className={`w-3 h-3 rounded-full transition-all duration-300 mt-1 ${
+                                        selectedCategory === category.key ? 'bg-amber-400' : 'bg-white/30'
+                                      }`} />
+                                      <div className={`text-right ${
+                                        selectedCategory === category.key ? 'text-amber-300' : 'text-white/70'
+                                      }`}>
+                                        <div className="text-2xl font-bold tracking-tight">
+                                          ${dailyPrices[category.key]}
+                                        </div>
+                                        <div className="text-xs font-light mt-1 opacity-80">/dia</div>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Content */}
+                                    <div className="space-y-4">
+                                      <div>
+                                        <h4 className="font-bold text-lg mb-2 tracking-tight">
+                                          {category.name}
+                                        </h4>
+                                        <p className="text-sm text-white/70 font-light leading-relaxed mb-3">
+                                          {category.description}
+                                        </p>
+                                        <div className="text-xs text-amber-300/80 font-medium">
+                                          <Users className="w-3 h-3 inline mr-1" />
+                                          {category.passengers}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Features */}
+                                      <div className="flex flex-wrap gap-2">
+                                        {category.features.map((feature, idx) => (
+                                          <span
+                                            key={idx}
+                                            className="text-xs bg-white/8 text-white/70 px-2 py-1 rounded-md font-light"
+                                          >
+                                            {feature}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Selection Indicator */}
+                                    {selectedCategory === category.key && (
+                                      <motion.div 
+                                        className="absolute top-4 right-4 w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                                      >
+                                        <CheckCircle className="w-4 h-4 text-black" />
+                                      </motion.div>
+                                    )}
+                                  </motion.button>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                        
+                        {/* Show More/Less Button - Only Mobile */}
+                        {otherCategories.length > 0 && (
+                          <motion.div 
+                            className="flex justify-center lg:hidden"
+                            style={{ marginTop: 'var(--space-10)' }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                          >
+                            <motion.button
+                              className="relative overflow-hidden bg-gradient-to-r from-white/10 via-white/8 to-white/10 backdrop-blur-sm border border-white/25 hover:border-amber-400/40 text-white font-medium transition-all duration-300 group"
+                              style={{ 
+                                padding: 'var(--space-2) var(--space-5)',
+                                gap: 'var(--space-2)',
+                                borderRadius: '8px'
+                              }}
+                              onClick={() => setShowAllCategories(!showAllCategories)}
+                              whileHover={{ 
+                                scale: 1.02,
+                                y: -2,
+                                transition: { type: 'spring', stiffness: 400, damping: 20 }
+                              }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              {/* Subtle Gradient Overlay */}
+                              <div className="absolute inset-0 bg-gradient-to-r from-amber-400/5 via-transparent to-amber-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                              
+                              <div className="relative z-10 flex items-center gap-3">
+                                <span className="text-sm tracking-[0.1em] uppercase">
+                                  {showAllCategories 
+                                    ? 'Ver Menos'
+                                    : 'Ver Todos os Veículos'
+                                  }
+                                </span>
+                                <motion.div
+                                  animate={{ rotate: showAllCategories ? 180 : 0 }}
+                                  transition={{ duration: 0.3 }}
+                                  className="text-amber-300"
+                                >
+                                  <ArrowRight className="w-4 h-4" />
+                                </motion.div>
+                              </div>
+                            </motion.button>
+                          </motion.div>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -515,27 +761,38 @@ export default function PriceCalculatorSection() {
                                 Data de Retirada
                               </div>
                               
-                              <input
-                                type="date"
-                                value={checkInDate}
-                                onChange={(e) => {
-                                  setCheckInDate(e.target.value);
-                                  if (checkOutDate && new Date(checkOutDate) <= new Date(e.target.value)) {
-                                    setCheckOutDate('');
-                                  }
-                                  setIsCalculating(true);
-                                  setTimeout(() => setIsCalculating(false), 800);
-                                }}
-                                min={today}
-                                max={maxDateString}
-                                className="w-full bg-white/8 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:border-green-400/60 focus:bg-white/12 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-400/20"
-                                style={{ 
-                                  padding: '1rem 1.25rem', 
-                                  borderRadius: '12px',
-                                  fontSize: '16px',
-                                  height: '56px'
-                                }}
-                              />
+                              <div className="relative">
+                                <input
+                                  type="date"
+                                  value={checkInDate}
+                                  onChange={(e) => {
+                                    setCheckInDate(e.target.value);
+                                    if (checkOutDate && new Date(checkOutDate) <= new Date(e.target.value)) {
+                                      setCheckOutDate('');
+                                    }
+                                    setIsCalculating(true);
+                                    setTimeout(() => setIsCalculating(false), 800);
+                                  }}
+                                  min={today}
+                                  max={maxDateString}
+                                  className="w-full bg-white/8 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:border-green-400/60 focus:bg-white/12 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-400/20 [&::-webkit-calendar-picker-indicator]:filter-invert [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                                  style={{ 
+                                    padding: '1rem 1.25rem', 
+                                    borderRadius: '12px',
+                                    fontSize: '16px',
+                                    height: '56px'
+                                  }}
+                                />
+                                {/* Invisible mobile trigger over native icon */}
+                                <button
+                                  type="button"
+                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 md:hidden opacity-0"
+                                  onClick={() => {
+                                    const input = document.querySelector('input[type="date"]') as HTMLInputElement;
+                                    if (input?.showPicker) input.showPicker();
+                                  }}
+                                />
+                              </div>
                               
                               {checkInDate && (
                                 <motion.div
@@ -571,25 +828,38 @@ export default function PriceCalculatorSection() {
                                 Data de Devolução
                               </div>
                               
-                              <input
-                                type="date"
-                                value={checkOutDate}
-                                onChange={(e) => {
-                                  setCheckOutDate(e.target.value);
-                                  setIsCalculating(true);
-                                  setTimeout(() => setIsCalculating(false), 800);
-                                }}
-                                min={checkInDate ? new Date(new Date(checkInDate).getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] : today}
-                                max={maxDateString}
-                                disabled={!checkInDate}
-                                className="w-full bg-white/8 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:border-red-400/60 focus:bg-white/12 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-400/20"
-                                style={{ 
-                                  padding: '1rem 1.25rem', 
-                                  borderRadius: '12px',
-                                  fontSize: '16px',
-                                  height: '56px'
-                                }}
-                              />
+                              <div className="relative">
+                                <input
+                                  type="date"
+                                  value={checkOutDate}
+                                  onChange={(e) => {
+                                    setCheckOutDate(e.target.value);
+                                    setIsCalculating(true);
+                                    setTimeout(() => setIsCalculating(false), 800);
+                                  }}
+                                  min={checkInDate ? new Date(new Date(checkInDate).getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0] : today}
+                                  max={maxDateString}
+                                  disabled={!checkInDate}
+                                  className="w-full bg-white/8 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:border-red-400/60 focus:bg-white/12 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-400/20 [&::-webkit-calendar-picker-indicator]:filter-invert [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                                  style={{ 
+                                    padding: '1rem 1.25rem', 
+                                    borderRadius: '12px',
+                                    fontSize: '16px',
+                                    height: '56px'
+                                  }}
+                                />
+                                {/* Invisible mobile trigger over native icon */}
+                                <button
+                                  type="button"
+                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 md:hidden opacity-0"
+                                  disabled={!checkInDate}
+                                  onClick={() => {
+                                    const inputs = document.querySelectorAll('input[type="date"]') as NodeListOf<HTMLInputElement>;
+                                    const input = inputs[1];
+                                    if (input?.showPicker && !input.disabled) input.showPicker();
+                                  }}
+                                />
+                              </div>
                               
                               {checkOutDate && (
                                 <motion.div

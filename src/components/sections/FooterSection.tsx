@@ -104,7 +104,7 @@ export default function FooterSection() {
             {/* Issue Header - Like Hero Section */}
             <motion.div
               className="flex items-center justify-center"
-              style={{ gap: 'var(--space-6)', marginBottom: 'var(--space-8)' }}
+              style={{ gap: 'var(--space-6)', marginBottom: 'var(--space-16)' }}
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -120,7 +120,7 @@ export default function FooterSection() {
             
             {/* Editorial Headline */}
             <motion.h2 
-              className="text-editorial-lg text-white tracking-tighter"
+              className="text-editorial-md text-white tracking-tighter"
               style={{ marginBottom: 'var(--space-6)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

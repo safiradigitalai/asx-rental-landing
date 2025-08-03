@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Users, Star, ArrowRight, Car } from 'lucide-react';
+import { Users, Star, ArrowRight, Car, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useRef } from 'react';
 
 interface VehicleCategory {
   id: string;
@@ -18,6 +19,9 @@ interface VehicleCategory {
 }
 
 export default function VehicleCategoriesSection() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  
   const categories: VehicleCategory[] = [
     {
       id: 'esportivo',
@@ -98,6 +102,35 @@ export default function VehicleCategoriesSection() {
     document.getElementById('calculadora')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const nextSlide = () => {
+    const newSlide = currentSlide === categories.length - 1 ? 0 : currentSlide + 1;
+    setCurrentSlide(newSlide);
+    scrollToSlide(newSlide);
+  };
+
+  const prevSlide = () => {
+    const newSlide = currentSlide === 0 ? categories.length - 1 : currentSlide - 1;
+    setCurrentSlide(newSlide);
+    scrollToSlide(newSlide);
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+    scrollToSlide(index);
+  };
+
+  const scrollToSlide = (index: number) => {
+    if (sliderRef.current) {
+      const cardWidth = 320; // clamp max width
+      const gap = 16; // var(--space-4) in pixels
+      const scrollPosition = index * (cardWidth + gap);
+      sliderRef.current.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <section id="categorias" className="editorial-section bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
       {/* Editorial Parallax Background */}
@@ -164,7 +197,7 @@ export default function VehicleCategoriesSection() {
             
             {/* Editorial Headline */}
             <motion.h2 
-              className="text-editorial-lg text-gray-900 tracking-tighter"
+              className="text-editorial-md text-gray-900 tracking-tighter"
               style={{ marginBottom: 'var(--space-6)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -179,7 +212,7 @@ export default function VehicleCategoriesSection() {
             {/* Editorial Subtext */}
             <motion.p 
               className="text-xl text-gray-600 max-w-3xl mx-auto font-light"
-              style={{ lineHeight: 'var(--baseline)', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}
+              style={{ lineHeight: '1.7', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -329,9 +362,49 @@ export default function VehicleCategoriesSection() {
           ))}
         </div>
 
-        {/* Mobile Slider - Same Pattern as Desktop */}
+        {/* Mobile Slider with Navigation */}
         <div className="lg:hidden">
-          <div className="overflow-x-auto scrollbar-hide">
+          {/* Navigation Arrows */}
+          <div className="flex items-center justify-center mb-6" style={{ gap: 'var(--space-4)' }}>
+            <motion.button
+              className="flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300"
+              style={{ 
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '12px' 
+              }}
+              onClick={prevSlide}
+              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </motion.button>
+            
+            <div className="text-center">
+              <div className="text-sm font-medium text-gray-600 tracking-[0.1em] uppercase">
+                {String(currentSlide + 1).padStart(2, '0')} / {String(categories.length).padStart(2, '0')}
+              </div>
+              <div className="text-xs text-gray-400 mt-1">
+                {categories[currentSlide]?.name}
+              </div>
+            </div>
+            
+            <motion.button
+              className="flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-amber-500 hover:border-amber-500/30 transition-all duration-300"
+              style={{ 
+                width: '48px', 
+                height: '48px', 
+                borderRadius: '12px' 
+              }}
+              onClick={nextSlide}
+              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ChevronRight className="w-6 h-6" />
+            </motion.button>
+          </div>
+          
+          <div className="overflow-x-auto scrollbar-hide" ref={sliderRef}>
             <div className="flex" style={{ gap: 'var(--space-4)', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}>
               {categories.map((category, index) => (
                 <motion.article
@@ -396,55 +469,72 @@ export default function VehicleCategoriesSection() {
                     </motion.div>
                   )}
 
-                  {/* Content Container - Adjusted for Mobile */}
-                  <div className="relative z-10 h-full flex flex-col text-white editorial-stack-lg" style={{ padding: 'var(--space-6)' }}>
-                    
-                    {/* Category Badge */}
-                    <motion.div 
-                      className="inline-flex items-center bg-amber-500/20 border border-amber-400/30 backdrop-blur-sm text-amber-300 text-xs font-medium tracking-[0.25em] uppercase w-fit"
-                      style={{ 
-                        gap: 'var(--space-1)', 
-                        padding: 'var(--space-2) var(--space-3)',
-                        marginBottom: 'var(--space-6)'
-                      }}
-                      whileHover={{ scale: 1.05, backgroundColor: 'rgba(245, 158, 11, 0.3)' }}
-                    >
-                      <Car className="w-3 h-3" />
-                      <span>{category.name}</span>
-                    </motion.div>
-                    
-                    {/* Vehicle Title */}
-                    <h3 className="text-headline font-bold leading-tight text-white" style={{ marginBottom: 'var(--space-4)' }}>
-                      {category.model}
-                    </h3>
-                    
-                    {/* Vehicle Details */}
-                    <div className="flex-1 editorial-stack" style={{ marginBottom: 'var(--space-6)' }}>
-                      <div className="flex items-center justify-between" style={{ marginBottom: 'var(--space-3)' }}>
-                        <div className="flex items-center text-white/80 text-sm">
-                          <Users className="w-4 h-4" style={{ marginRight: 'var(--space-1)' }} />
+                  {/* Editorial Content Layer - Same Pattern as Desktop */}
+                  <div 
+                    className="relative z-10 h-full flex flex-col justify-center items-center text-white text-center"
+                    style={{ padding: 'var(--space-6)' }}
+                  >
+                    {/* Content Block - Centralized - Same as Desktop */}
+                    <div className="w-full" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', alignItems: 'center' }}>
+                      {/* Vehicle Category Badge */}
+                      <div 
+                        className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/30 text-amber-300 text-xs font-medium tracking-[0.2em] uppercase"
+                        style={{ 
+                          gap: 'var(--space-1)', 
+                          padding: 'var(--space-1) var(--space-3)',
+                          borderRadius: '20px'
+                        }}
+                      >
+                        <Car className="w-3 h-3" />
+                        <span>{category.name}</span>
+                      </div>
+                      
+                      {/* Vehicle Title */}
+                      <h3 className="text-editorial-sm leading-tight">
+                        {category.model.toUpperCase()}
+                      </h3>
+                      
+                      {/* Vehicle Details */}
+                      <p className="text-white/70 text-base font-light">
+                        {category.year} • {category.color}
+                      </p>
+                      
+                      {/* Capacity & Price */}
+                      <div className="flex items-center justify-center w-full" style={{ gap: 'var(--space-4)' }}>
+                        <div className="flex items-center text-white/60 text-sm" style={{ gap: 'var(--space-2)' }}>
+                          <Users className="w-4 h-4" />
                           <span>{category.passengers} pessoas</span>
                         </div>
-                        <div className="text-amber-400 font-bold text-lg">
-                          ${category.dailyPrice}/dia
+                        <div className="text-amber-300 font-bold text-lg">
+                          ${category.dailyPrice}
+                          <span className="text-white/60 text-sm font-light">/dia</span>
                         </div>
                       </div>
                       
-                      <div className="text-white/60 text-sm">
-                        {category.color} • {category.year}
+                      {/* Editorial Features List */}
+                      <div>
+                        <div className="text-white/50 text-xs font-medium tracking-[0.15em] uppercase" style={{ marginBottom: 'var(--space-1)' }}>
+                          Características
+                        </div>
+                        <div className="text-white/70 text-sm font-light leading-relaxed">
+                          {category.features.slice(0, 3).join(' • ')}
+                          {category.features.length > 3 && (
+                            <span className="text-white/50"> • +{category.features.length - 3} mais</span>
+                          )}
+                        </div>
                       </div>
+                      
+                      {/* Premium CTA */}
+                      <motion.div 
+                        className="flex items-center text-amber-300 font-medium group-hover:text-white transition-colors duration-300 cursor-pointer"
+                        style={{ gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}
+                        whileHover={{ x: 4 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                      >
+                        <span className="text-sm tracking-wide">Reservar Veículo</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </motion.div>
                     </div>
-                    
-                    {/* CTA Button */}
-                    <motion.div 
-                      className="flex items-center text-amber-300 font-medium text-sm cursor-pointer"
-                      style={{ gap: 'var(--space-2)' }}
-                      whileHover={{ x: 4 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                    >
-                      <span className="tracking-wide">Ver detalhes</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </motion.div>
                   </div>
                 </motion.article>
               ))}
@@ -453,7 +543,8 @@ export default function VehicleCategoriesSection() {
           
           {/* Mobile Slider Dots */}
           <motion.div 
-            className="flex justify-center mt-6"
+            className="flex justify-center"
+            style={{ marginTop: 'var(--space-8)' }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -461,9 +552,10 @@ export default function VehicleCategoriesSection() {
           >
             <div className="flex items-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2" style={{ gap: 'var(--space-2)' }}>
               {categories.map((_, index) => (
-                <motion.div
+                <motion.button
                   key={`dot-${index}`}
                   className="relative cursor-pointer"
+                  onClick={() => goToSlide(index)}
                   whileHover={{ scale: 1.3 }}
                   whileTap={{ scale: 0.8 }}
                 >
@@ -472,8 +564,8 @@ export default function VehicleCategoriesSection() {
                     className="absolute inset-0 w-2 h-2 rounded-full bg-amber-400"
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{
-                      scale: index === 0 ? 1 : 0,
-                      opacity: index === 0 ? 1 : 0
+                      scale: index === currentSlide ? 1 : 0,
+                      opacity: index === currentSlide ? 1 : 0
                     }}
                     transition={{ 
                       type: 'spring', 
@@ -491,7 +583,7 @@ export default function VehicleCategoriesSection() {
                       transition: { duration: 0.2 }
                     }}
                   />
-                </motion.div>
+                </motion.button>
               ))}
             </div>
           </motion.div>

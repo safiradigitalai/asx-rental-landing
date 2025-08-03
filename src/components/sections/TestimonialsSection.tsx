@@ -152,7 +152,8 @@ export default function TestimonialsSection() {
               className="inline-flex items-center bg-amber-500/10 border border-amber-500/20 text-amber-700 text-sm font-medium tracking-[0.2em] uppercase"
               style={{ 
                 gap: 'var(--space-2)', 
-                padding: 'var(--space-2) var(--space-4)'
+                padding: 'var(--space-2) var(--space-4)',
+                marginBottom: 'var(--space-8)'
               }}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -163,7 +164,7 @@ export default function TestimonialsSection() {
             
             {/* Editorial Headline */}
             <motion.h2 
-              className="text-editorial-lg text-gray-900 tracking-tighter"
+              className="text-editorial-md text-gray-900 tracking-tighter"
               style={{ marginBottom: 'var(--space-2)' }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -178,7 +179,7 @@ export default function TestimonialsSection() {
             {/* Editorial Subtext */}
             <motion.p 
               className="text-xl text-gray-600 max-w-3xl mx-auto font-light"
-              style={{ lineHeight: 'var(--baseline)', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}
+              style={{ lineHeight: '1.7', paddingLeft: 'var(--space-4)', paddingRight: 'var(--space-4)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
