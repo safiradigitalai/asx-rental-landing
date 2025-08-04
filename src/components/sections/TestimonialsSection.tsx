@@ -95,11 +95,6 @@ export default function TestimonialsSection() {
     );
   }, [testimonials.length]);
 
-  const prevTestimonial = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
-    );
-  };
 
   const goToTestimonial = (index: number) => {
     setCurrentIndex(index);
@@ -241,11 +236,17 @@ export default function TestimonialsSection() {
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star 
                           key={i}
-                          className={`w-5 h-5 ${
+                          className={`w-5 h-5 fill-current ${
                             i < currentTestimonial.rating 
-                              ? 'text-amber-300 fill-current' 
+                              ? 'text-transparent' 
                               : 'text-white/30'
                           }`}
+                          style={i < currentTestimonial.rating ? {
+                            background: 'linear-gradient(135deg, #0066CC 0%, #3B82F6 30%, #F59E0B 70%, #FBBF24 100%)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent'
+                          } : {}}
                         />
                       ))}
                     </div>
@@ -386,7 +387,11 @@ export default function TestimonialsSection() {
                 className="relative z-10 h-full flex flex-col justify-center items-center text-gray-900"
                 style={{ padding: 'var(--space-6)' }}
               >
-                <div className="text-4xl font-bold text-amber-600" style={{ marginBottom: 'var(--space-2)' }}>{stat.number}</div>
+                <div className="text-4xl font-bold" style={{ marginBottom: 'var(--space-2)' }}>
+                  <span className="text-transparent bg-gradient-to-r from-blue-600 via-blue-500 to-amber-600 bg-clip-text">
+                    {stat.number}
+                  </span>
+                </div>
                 <div className="text-gray-600 text-base font-medium">{stat.label}</div>
               </div>
             </motion.article>

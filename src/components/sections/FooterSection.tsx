@@ -2,14 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { 
-  Phone, 
-  Mail, 
-  Clock, 
   Instagram,
-  Star,
-  Shield,
-  CreditCard,
-  ArrowRight,
   MessageCircle
 } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
@@ -26,18 +19,29 @@ export default function FooterSection() {
   };
 
   return (
-    <footer className="bg-gray-950 relative overflow-hidden" style={{ paddingTop: 'var(--space-12)' }}>
-      {/* Subtle Editorial Pattern - Like Paper Texture */}
+    <footer className="relative overflow-hidden" style={{ paddingTop: 'var(--space-12)' }}>
+      {/* Premium Blue Background - Matching Diferencial Cards */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900" />
+
+      {/* Animated Pattern - Matching Diferencial Cards */}
       <motion.div 
-        className="absolute inset-0 opacity-[0.02]"
+        className="absolute inset-0 opacity-8"
+        animate={{ 
+          backgroundPosition: ['0% 0%', '100% 100%'],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: 'linear'
+        }}
         style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)',
-          backgroundSize: '24px 24px'
+          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)',
+          backgroundSize: 'var(--space-8) var(--space-8)'
         }}
       />
       
-      {/* Minimal Gradient - Very Subtle */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+      {/* Blue Gradient Overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-300/5" />
 
       <div className="editorial-container relative z-10">
 
@@ -58,7 +62,7 @@ export default function FooterSection() {
             </div>
             
             {/* Elegant Tagline */}
-            <div className="text-white/60 text-sm font-light tracking-[0.2em] uppercase">
+            <div className="text-blue-200 text-sm font-light tracking-[0.2em] uppercase">
               Orlando Rental Experience
             </div>
           </motion.section>
@@ -76,7 +80,7 @@ export default function FooterSection() {
           >
             {/* WhatsApp */}
             <motion.button
-              className="flex items-center text-white/70 hover:text-amber-400 transition-colors duration-300 cursor-pointer"
+              className="flex items-center text-blue-200 hover:text-amber-300 transition-colors duration-300 cursor-pointer"
               style={{ gap: 'var(--space-2)' }}
               onClick={() => scrollToSection('https://wa.me/message/2Z77HXH2TB3DO1')}
               whileHover={{ scale: 1.05 }}
@@ -86,11 +90,11 @@ export default function FooterSection() {
             </motion.button>
 
             {/* Divider */}
-            <div className="w-px h-4 bg-white/20" />
+            <div className="w-px h-4 bg-blue-300/30" />
 
             {/* Instagram */}
             <motion.button
-              className="flex items-center text-white/70 hover:text-pink-400 transition-colors duration-300 cursor-pointer"
+              className="flex items-center text-blue-200 hover:text-amber-300 transition-colors duration-300 cursor-pointer"
               style={{ gap: 'var(--space-2)' }}
               onClick={() => window.open('https://instagram.com/asxgroup', '_blank')}
               whileHover={{ scale: 1.05 }}
@@ -100,23 +104,28 @@ export default function FooterSection() {
             </motion.button>
           </motion.section>
 
-          {/* Trust Line - Subtle */}
+          {/* Trust Line - Enhanced with Blue Background */}
           <motion.section
-            className="text-white/50 text-sm font-light"
+            className="text-blue-100/70 text-sm font-light"
             style={{ marginBottom: 'var(--space-6)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <span className="text-amber-400 font-medium">10.000+</span> brasileiros • <span className="text-amber-400 font-medium">4.9★</span> avaliação
+            <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-400 bg-clip-text font-medium">10.000+</span> brasileiros • <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-400 bg-clip-text font-medium">4.9★</span> avaliação
           </motion.section>
 
         </div>
 
         {/* Editorial Bottom Bar */}
         <motion.footer 
-          className="magazine-grid border-t border-white/10"
-          style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}
+          className="magazine-grid"
+          style={{ 
+            paddingTop: 'var(--space-4)', 
+            paddingBottom: 'var(--space-4)',
+            borderTop: '1px solid transparent',
+            borderImage: 'linear-gradient(90deg, rgba(0,102,204,0.2) 0%, rgba(59,130,246,0.3) 25%, rgba(245,158,11,0.3) 75%, rgba(251,191,36,0.2) 100%) 1'
+          }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.8 }}
@@ -124,12 +133,12 @@ export default function FooterSection() {
         >
           <div className="col-span-12">
             <div className="flex flex-col lg:flex-row items-center justify-between" style={{ gap: 'var(--space-4)' }}>
-              <div className="text-white/60 text-sm font-light">
+              <div className="text-blue-100/60 text-sm font-light">
                 © {currentYear} ASX Group Rental Cars. Todos os direitos reservados.
               </div>
               
-              <div className="text-white/60 text-sm font-light">
-                by: <span className="text-amber-400 font-semibold">Safira Digital</span>
+              <div className="text-blue-100/60 text-sm font-light">
+                by: <span className="text-amber-300 font-semibold">Safira Digital</span>
               </div>
             </div>
           </div>

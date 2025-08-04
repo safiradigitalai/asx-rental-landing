@@ -79,7 +79,7 @@ export default function PriceCalculatorSection() {
         // Coming from vehicle cards section - use long delay with animation
         setIsExternalSelection(true);
         
-        const categoryButton = document.querySelector(`[data-category="${category}"]`);
+        const categoryButton = document.querySelector(`[data-category="${category}"]`) as HTMLElement;
         if (categoryButton) {
           // Add dramatic highlight animation
           categoryButton.style.transform = 'scale(1.08)';
@@ -250,7 +250,7 @@ export default function PriceCalculatorSection() {
   // Scroll modal to form start
   const scrollToFormStart = () => {
     const modalContent = document.querySelector('.modal-content');
-    const modalHeader = document.querySelector('.modal-header');
+    const modalHeader = document.querySelector('.modal-header') as HTMLElement;
     if (modalContent && modalHeader) {
       const headerHeight = modalHeader.offsetHeight;
       modalContent.scrollTo({ top: headerHeight, behavior: 'smooth' });
@@ -600,8 +600,10 @@ export default function PriceCalculatorSection() {
                             </motion.div>
                           )}
                         </div>
-                        <div className="text-amber-300 text-sm font-medium">
-                          Passo 1 de 4
+                        <div className="text-sm font-medium">
+                          <span className="text-transparent bg-gradient-to-r from-blue-400 to-amber-300 bg-clip-text">
+                            Passo 1 de 4
+                          </span>
                         </div>
                       </div>
                       
@@ -947,8 +949,10 @@ export default function PriceCalculatorSection() {
                               Quando será sua viagem?
                             </div>
                             <div className="flex items-center gap-6">
-                              <div className="text-blue-300 text-sm font-medium">
-                                Passo 2 de 4
+                              <div className="text-sm font-medium">
+                                <span className="text-transparent bg-gradient-to-r from-blue-400 to-amber-300 bg-clip-text">
+                                  Passo 2 de 4
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -1178,8 +1182,10 @@ export default function PriceCalculatorSection() {
                             <div className="text-white font-semibold text-xl tracking-wide">
                               Quantas pessoas viajam?
                             </div>
-                            <div className="text-purple-300 text-sm font-medium">
-                              Passo 3 de 4
+                            <div className="text-sm font-medium">
+                              <span className="text-transparent bg-gradient-to-r from-blue-400 to-amber-300 bg-clip-text">
+                                Passo 3 de 4
+                              </span>
                             </div>
                           </div>
                           
@@ -1256,9 +1262,11 @@ export default function PriceCalculatorSection() {
                             </div>
                             Sua Reserva Está Quase Pronta!
                           </div>
-                          <div className="flex items-center justify-center gap-3 text-emerald-300 text-sm font-medium">
-                            <CheckCircle className="w-4 h-4" />
-                            <span>Passo 4 de 4 - Concluído</span>
+                          <div className="flex items-center justify-center gap-3 text-sm font-medium">
+                            <CheckCircle className="w-4 h-4 text-emerald-400" />
+                            <span className="text-transparent bg-gradient-to-r from-emerald-400 via-blue-400 to-amber-300 bg-clip-text">
+                              Passo 4 de 4 - Concluído
+                            </span>
                           </div>
                         </div>
 

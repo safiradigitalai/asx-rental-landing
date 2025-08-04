@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Users, Star, ArrowRight, ChevronLeft, ChevronRight, Car } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { openWhatsAppMessage } from '@/lib/whatsapp';
@@ -35,7 +36,7 @@ export default function VehicleCategoriesSection() {
       passengers: 2,
       priceRange: '$95-140/dia',
       dailyPrice: 49.99,
-      imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2340&auto=format&fit=crop',
+      imageUrl: 'https://moparinsiders.com/wp-content/uploads/2022/11/2008-Dodge-Challenger-SRT8-in-HEMI-Orange.-Mecum-1.jpg',
       features: ['Motor V6', 'Esportivo', 'Som Premium', 'Performance']
     },
     {
@@ -47,7 +48,7 @@ export default function VehicleCategoriesSection() {
       passengers: 8,
       priceRange: '$85-120/dia',
       dailyPrice: 64.99,
-      imageUrl: 'https://images.unsplash.com/photo-1520446266423-b915a1f7b994?q=80&w=2340&auto=format&fit=crop',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/2020_Chrysler_Pacifica_Touring-L_in_Bright_White%2C_front_left.jpg/960px-2020_Chrysler_Pacifica_Touring-L_in_Bright_White%2C_front_left.jpg',
       features: ['8 Lugares', 'Couro', 'Tela Touchscreen', 'Câmera de Ré']
     },
     {
@@ -59,7 +60,7 @@ export default function VehicleCategoriesSection() {
       passengers: 7,
       priceRange: '$65-85/dia',
       dailyPrice: 54.99,
-      imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=2340&auto=format&fit=crop',
+      imageUrl: 'https://hips.hearstapps.com/hmg-prod/amv-prod-cad-assets/images/16q2/667349/2016-dodge-grand-caravan-review-car-and-driver-photo-669240-s-original.jpg?fill=1:1&resize=1200:*',
       features: ['7 Lugares', 'Porta Traseira Automática', 'Espaço Bagagem', 'GPS']
     },
     {
@@ -71,7 +72,7 @@ export default function VehicleCategoriesSection() {
       passengers: 5,
       priceRange: '$45-65/dia',
       dailyPrice: 44.99,
-      imageUrl: 'https://images.unsplash.com/photo-1550355191-aa8a80b41353?q=80&w=2340&auto=format&fit=crop',
+      imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/41138/elantra-exterior-right-front-three-quarter.jpeg?q=80',
       features: ['Econômico', 'Ar Condicionado', 'Direção Elétrica', 'Bluetooth']
     },
     {
@@ -83,7 +84,7 @@ export default function VehicleCategoriesSection() {
       passengers: 7,
       priceRange: '$70-95/dia',
       dailyPrice: 54.99,
-      imageUrl: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=2340&auto=format&fit=crop',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Chevrolet_Equinox_LT_%28III%2C_Facelift%29_%E2%80%93_f_05102022.jpg/1200px-Chevrolet_Equinox_LT_%28III%2C_Facelift%29_%E2%80%93_f_05102022.jpg',
       features: ['AWD', 'Porta-Bagagem Elétrica', 'Sensores', 'Apple CarPlay']
     },
     {
@@ -95,7 +96,7 @@ export default function VehicleCategoriesSection() {
       passengers: 8,
       priceRange: '$120-160/dia',
       dailyPrice: 149.90,
-      imageUrl: 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?q=80&w=2340&auto=format&fit=crop',
+      imageUrl: 'https://cdn.motor1.com/images/mgl/k0kOY/s1/4x3/chevrolet-suburban.webp',
       features: ['8 Lugares', 'Luxo Premium', '4WD', 'Teto Solar']
     }
   ];
@@ -378,9 +379,24 @@ export default function VehicleCategoriesSection() {
               }}
               onClick={() => handleCategorySelect(category)}
             >
-              {/* Clean Premium Background */}
+              {/* Vehicle Background Image with Hover Zoom */}
               <motion.div 
-                className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
+                className="absolute inset-0 overflow-hidden"
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+              >
+                <Image
+                  src={category.imageUrl}
+                  alt={`${category.model} ${category.name}`}
+                  fill
+                  className="object-cover object-center opacity-60"
+                  quality={90}
+                />
+              </motion.div>
+
+              {/* Premium Black Background Filter */}
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-800/85 to-black/80"
                 whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
               />
@@ -402,19 +418,26 @@ export default function VehicleCategoriesSection() {
                 }}
               />
               
-              {/* Elegant Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-400/8 via-transparent to-amber-300/4" />
+              {/* Blue Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-300/5" />
 
-              {/* Popular Badge */}
+              {/* Popular Badge - Gold Premium Style */}
               {category.popular && (
                 <motion.div 
-                  className="absolute top-4 right-4 z-20 inline-flex items-center bg-amber-500/20 border border-amber-400/30 backdrop-blur-sm text-amber-300 text-xs font-medium tracking-[0.25em] uppercase"
+                  className="absolute top-4 right-4 z-20 inline-flex items-center backdrop-blur-sm text-xs font-medium tracking-[0.25em] uppercase"
                   style={{ 
                     gap: 'var(--space-1)', 
                     padding: 'var(--space-2) var(--space-3)',
-                    borderRadius: '20px'
+                    borderRadius: '20px',
+                    background: 'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(251,191,36,0.15) 50%, rgba(0,102,204,0.1) 100%)',
+                    border: '1px solid rgba(245,158,11,0.4)',
+                    color: '#FCD34D'
                   }}
-                  whileHover={{ scale: 1.05, backgroundColor: 'rgba(245, 158, 11, 0.3)' }}
+                  whileHover={{ 
+                    scale: 1.05, 
+                    backgroundColor: 'rgba(245,158,11,0.25)',
+                    borderColor: 'rgba(251,191,36,0.5)'
+                  }}
                 >
                   <Star className="w-3 h-3 fill-current" />
                   <span>Popular</span>
@@ -430,7 +453,7 @@ export default function VehicleCategoriesSection() {
                 <div className="w-full" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', alignItems: 'center' }}>
                   {/* Vehicle Category Badge */}
                   <div 
-                    className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/30 text-amber-300 text-xs font-medium tracking-[0.2em] uppercase"
+                    className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/40 text-amber-200 text-xs font-medium tracking-[0.2em] uppercase"
                     style={{ 
                       padding: 'var(--space-1) var(--space-3)',
                       borderRadius: '20px'
@@ -451,13 +474,15 @@ export default function VehicleCategoriesSection() {
                   
                   {/* Capacity & Price */}
                   <div className="flex items-center justify-center w-full" style={{ gap: 'var(--space-6)' }}>
-                    <div className="flex items-center text-white/60 text-base" style={{ gap: 'var(--space-2)' }}>
-                      <Users className="w-5 h-5" />
-                      <span>{category.passengers} pessoas</span>
+                    <div className="flex items-center text-base" style={{ gap: 'var(--space-2)' }}>
+                      <Users className="w-5 h-5 text-blue-400" />
+                      <span className="text-white/60">{category.passengers} pessoas</span>
                     </div>
-                    <div className="text-amber-300 font-bold text-xl">
-                      ${category.dailyPrice}
-                      <span className="text-white/60 text-sm font-light">/dia</span>
+                    <div className="font-bold text-xl">
+                      <span className="text-transparent bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200 bg-clip-text">
+                        ${category.dailyPrice}
+                      </span>
+                      <span className="text-blue-200/80 text-sm font-light">/dia</span>
                     </div>
                   </div>
                   
@@ -476,7 +501,7 @@ export default function VehicleCategoriesSection() {
                   
                   {/* Premium CTA */}
                   <motion.div 
-                    className="flex items-center text-amber-300 font-medium group-hover:text-white transition-colors duration-300 cursor-pointer"
+                    className="flex items-center text-amber-300 font-medium group-hover:text-amber-100 transition-colors duration-300 cursor-pointer"
                     style={{ gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}
                     whileHover={{ x: 8 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
@@ -544,13 +569,24 @@ export default function VehicleCategoriesSection() {
                   }}
                   onClick={() => handleCategorySelect(category)}
                 >
-                  {/* Premium Background */}
+                  {/* Vehicle Background Image */}
+                  <div className="absolute inset-0">
+                    <Image
+                      src={category.imageUrl}
+                      alt={`${category.model} ${category.name}`}
+                      fill
+                      className="object-cover object-center opacity-40"
+                      quality={90}
+                    />
+                  </div>
+
+                  {/* Premium Black Background Filter */}
                   <motion.div 
-                    className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
+                    className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-800/85 to-black/80"
                     animate={{
                       boxShadow: index === currentSlide 
-                        ? '0 20px 40px rgba(245,158,11,0.15), 0 8px 25px rgba(245,158,11,0.1)'
-                        : '0 8px 25px rgba(0,0,0,0.1)'
+                        ? '0 20px 40px rgba(59,130,246,0.2), 0 8px 25px rgba(245,158,11,0.1)'
+                        : '0 8px 25px rgba(30,58,138,0.15)'
                     }}
                     whileHover={{ scale: 1.02 }}
                     transition={{ 
@@ -577,23 +613,23 @@ export default function VehicleCategoriesSection() {
                     }}
                   />
                   
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400/8 via-transparent to-amber-300/4" />
+                  {/* Blue Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-300/5" />
 
-                  {/* Popular Badge */}
+                  {/* Popular Badge - Gold Premium Style */}
                   {category.popular && (
                     <motion.div 
                       className="absolute top-4 right-4 z-20"
                       style={{
-                        background: 'linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%)',
+                        background: 'linear-gradient(135deg, rgba(245,158,11,0.9) 0%, rgba(251,191,36,0.8) 50%, rgba(0,102,204,0.2) 100%)',
                         color: 'white',
                         fontSize: '10px',
                         fontWeight: '700',
                         padding: 'var(--space-2) var(--space-3)',
                         borderRadius: '16px',
-                        boxShadow: '0 6px 20px rgba(59,130,246,0.3)',
+                        boxShadow: '0 6px 20px rgba(245,158,11,0.4)',
                         letterSpacing: '0.08em',
-                        border: '1px solid rgba(255,255,255,0.2)'
+                        border: '1px solid rgba(245,158,11,0.3)'
                       }}
                       initial={{ scale: 0, rotate: -10 }}
                       animate={{ scale: 1, rotate: 0 }}
@@ -611,7 +647,7 @@ export default function VehicleCategoriesSection() {
                     <div className="w-full" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', alignItems: 'center' }}>
                       {/* Category Badge */}
                       <div 
-                        className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/30 text-amber-300 text-xs font-medium tracking-[0.2em] uppercase"
+                        className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/40 text-amber-200 text-xs font-medium tracking-[0.2em] uppercase"
                         style={{ 
                           padding: 'var(--space-2) var(--space-4)',
                           borderRadius: '20px'
@@ -632,13 +668,15 @@ export default function VehicleCategoriesSection() {
                       
                       {/* Capacity & Price */}
                       <div className="flex items-center justify-center w-full" style={{ gap: 'var(--space-6)' }}>
-                        <div className="flex items-center text-white/60 text-base" style={{ gap: 'var(--space-2)' }}>
-                          <Users className="w-5 h-5" />
-                          <span>{category.passengers} pessoas</span>
+                        <div className="flex items-center text-base" style={{ gap: 'var(--space-2)' }}>
+                          <Users className="w-5 h-5 text-blue-400" />
+                          <span className="text-white/60">{category.passengers} pessoas</span>
                         </div>
-                        <div className="text-amber-300 font-bold text-xl">
-                          ${category.dailyPrice}
-                          <span className="text-white/60 text-base font-light">/dia</span>
+                        <div className="font-bold text-xl">
+                          <span className="text-transparent bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200 bg-clip-text">
+                            ${category.dailyPrice}
+                          </span>
+                          <span className="text-blue-200/80 text-base font-light">/dia</span>
                         </div>
                       </div>
                       
@@ -757,16 +795,16 @@ export default function VehicleCategoriesSection() {
                 transition: { type: 'spring', stiffness: 300, damping: 20 }
               }}
             >
-              {/* Parallax Background */}
+              {/* Premium Blue Background */}
               <motion.div 
-                className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
+                className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900"
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.8, ease: 'easeOut' }}
               />
               
               {/* Animated Pattern */}
               <motion.div 
-                className="absolute inset-0 opacity-10"
+                className="absolute inset-0 opacity-8"
                 animate={{ 
                   backgroundPosition: ['0% 0%', '100% 100%'],
                 }}
@@ -776,13 +814,13 @@ export default function VehicleCategoriesSection() {
                   ease: 'linear'
                 }}
                 style={{
-                  backgroundImage: 'radial-gradient(circle at 3px 3px, rgba(255,255,255,0.3) 1px, transparent 0)',
+                  backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)',
                   backgroundSize: 'var(--space-8) var(--space-8)'
                 }}
               />
               
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-transparent to-blue-400/10" />
+              {/* Blue Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-300/5" />
               
               <div className="relative z-10 text-white">
                 {/* Enhanced Title */}
@@ -811,25 +849,25 @@ export default function VehicleCategoriesSection() {
                 {/* Premium CTA - Destaque para Especialista */}
                 <div className="flex justify-center">
                   <motion.button
-                    className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-lg tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden shadow-2xl"
+                    className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-blue-900 font-bold text-lg tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden shadow-2xl border border-amber-300/40"
                     style={{ 
                       padding: 'var(--space-5) var(--space-12)',
                       gap: 'var(--space-4)',
                       borderRadius: '12px',
-                      boxShadow: '0 8px 32px rgba(245,158,11,0.4), 0 4px 16px rgba(245,158,11,0.2)'
+                      boxShadow: '0 8px 32px rgba(245,158,11,0.4), 0 4px 16px rgba(0,102,204,0.15)'
                     }}
                     onClick={() => openWhatsAppMessage('hero')}
                     whileHover={{ 
                       scale: 1.08,
                       y: -6,
-                      boxShadow: '0 12px 40px rgba(245,158,11,0.5), 0 6px 20px rgba(245,158,11,0.3)',
+                      boxShadow: '0 12px 40px rgba(245,158,11,0.5), 0 6px 20px rgba(0,102,204,0.2)',
                       transition: { type: 'spring', stiffness: 400, damping: 17 }
                     }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <span className="relative z-10 font-black">FALAR COM ESPECIALISTA</span>
                     <ArrowRight className="w-6 h-6 relative z-10" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
                   </motion.button>
                 </div>
               </div>

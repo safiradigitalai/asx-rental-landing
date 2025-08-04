@@ -22,8 +22,8 @@ interface DiferencialCard {
 }
 
 export default function DiferenciaisSection() {
-  // Tags personalizadas para cada diferencial
-  const customTags = ['Segurança', 'Livre', 'Ilimitado', '24/7', 'Express', 'Grátis'];
+  // Tags específicas que descrevem cada benefício (na ordem correta dos diferenciais)
+  const customTags = ['Pague na Entrega', 'Cartão Liberado', 'Rode à Vontade', 'Suporte BR', 'Pegue Direto', 'Incluso Grátis'];
   
   // Estado para controlar o slider
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -327,16 +327,16 @@ export default function DiferenciaisSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
           >
-            {/* Parallax Background Layer */}
+            {/* Premium Blue Background Layer */}
             <motion.div 
-              className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"
+              className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
             />
             
             {/* Animated Pattern Overlay */}
             <motion.div 
-              className="absolute inset-0 opacity-10"
+              className="absolute inset-0 opacity-8"
               animate={{ 
                 backgroundPosition: ['0% 0%', '100% 100%'],
               }}
@@ -346,13 +346,13 @@ export default function DiferenciaisSection() {
                 ease: 'linear'
               }}
               style={{
-                backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.3) 1px, transparent 0)',
+                backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)',
                 backgroundSize: 'var(--space-6) var(--space-6)'
               }}
             />
             
-            {/* Gradient Overlay for depth */}
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 via-transparent to-amber-400/10" />
+            {/* Blue Gradient Overlay for depth */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-300/5" />
             
             {/* Desktop Layout */}
             <motion.div 
@@ -361,15 +361,22 @@ export default function DiferenciaisSection() {
               whileHover={{ y: -4 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             >
-              {/* Premium Badge */}
+              {/* Premium Badge - Enhanced Blue + Gold */}
               <motion.div 
-                className="inline-flex items-center bg-amber-500/20 border border-amber-400/30 backdrop-blur-sm text-amber-300 text-xs font-medium tracking-[0.25em] uppercase"
+                className="inline-flex items-center backdrop-blur-sm text-xs font-medium tracking-[0.25em] uppercase"
                 style={{ 
                   gap: 'var(--space-2)', 
                   padding: 'var(--space-2) var(--space-4)',
-                  marginBottom: 'var(--space-8)'
+                  marginBottom: 'var(--space-8)',
+                  background: 'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(251,191,36,0.15) 50%, rgba(0,102,204,0.1) 100%)',
+                  border: '1px solid rgba(245,158,11,0.4)',
+                  color: '#FCD34D'
                 }}
-                whileHover={{ scale: 1.05, backgroundColor: 'rgba(245, 158, 11, 0.3)' }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  backgroundColor: 'rgba(245,158,11,0.25)',
+                  borderColor: 'rgba(251,191,36,0.5)'
+                }}
               >
                 <CreditCard className="w-4 h-4" />
                 <span>Segurança Total</span>
@@ -390,7 +397,7 @@ export default function DiferenciaisSection() {
               </p>
               
               <motion.div 
-                className="flex items-center text-amber-300 font-medium group-hover:text-amber-200 transition-colors duration-300 cursor-pointer"
+                className="flex items-center text-amber-300 font-medium group-hover:text-amber-100 transition-colors duration-300 cursor-pointer"
                 style={{ gap: 'var(--space-3)' }}
                 whileHover={{ x: 8 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 17 }}
@@ -640,7 +647,7 @@ export default function DiferenciaisSection() {
                           }}
                         >
                           {diferencial.icon}
-                          <span>{customTags[index + 1]}</span>
+                          <span>{customTags[index + 3]}</span>
                         </div>
                         
                         <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-2)' }}>
@@ -746,7 +753,7 @@ export default function DiferenciaisSection() {
                           }}
                         >
                           {diferencial.icon}
-                          <span>{customTags[index + 1]}</span>
+                          <span>{customTags[5]}</span>
                         </div>
                         
                         <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-2)' }}>
