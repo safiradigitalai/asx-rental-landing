@@ -96,11 +96,11 @@ export default function FooterSection() {
             <motion.button
               className="flex items-center text-blue-200 hover:text-amber-300 transition-colors duration-300 cursor-pointer"
               style={{ gap: 'var(--space-2)' }}
-              onClick={() => window.open('https://instagram.com/asxgroup', '_blank')}
+              onClick={() => window.open('https://instagram.com/asxgroup.rental', '_blank')}
               whileHover={{ scale: 1.05 }}
             >
               <Instagram className="w-5 h-5" />
-              <span className="text-sm font-light tracking-wide">@asxgroup</span>
+              <span className="text-sm font-light tracking-wide">@asxgroup.rental</span>
             </motion.button>
           </motion.section>
 

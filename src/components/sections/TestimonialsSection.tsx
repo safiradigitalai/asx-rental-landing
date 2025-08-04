@@ -2,14 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { Star, MessageSquare } from 'lucide-react';
 
 interface Testimonial {
   id: number;
   name: string;
   location: string;
-  avatar: string;
   rating: number;
   date: string;
   vehicleCategory: string;
@@ -31,7 +29,6 @@ export default function TestimonialsSection() {
       id: 1,
       name: "Maria Silva",
       location: "São Paulo, SP",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3",
       rating: 5,
       date: "Dezembro 2024",
       vehicleCategory: "Minivan Luxo",
@@ -43,7 +40,6 @@ export default function TestimonialsSection() {
       id: 2,
       name: "Carlos Santos",
       location: "Rio de Janeiro, RJ",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3",
       rating: 5,
       date: "Janeiro 2025",
       vehicleCategory: "SUV",
@@ -55,7 +51,6 @@ export default function TestimonialsSection() {
       id: 3,
       name: "Ana Oliveira",
       location: "Belo Horizonte, MG",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3",
       rating: 5,
       date: "Novembro 2024",
       vehicleCategory: "Sedan",
@@ -67,7 +62,6 @@ export default function TestimonialsSection() {
       id: 4,
       name: "Roberto Lima",
       location: "Porto Alegre, RS",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3",
       rating: 5,
       date: "Dezembro 2024",
       vehicleCategory: "Suburban",
@@ -79,7 +73,6 @@ export default function TestimonialsSection() {
       id: 5,
       name: "Patricia Costa",
       location: "Brasília, DF",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3",
       rating: 5,
       date: "Janeiro 2025",
       vehicleCategory: "Esportivo",
@@ -272,31 +265,12 @@ export default function TestimonialsSection() {
                       </div>
                     </div>
 
-                    {/* Client Info */}
-                    <div className="flex flex-col md:flex-row items-center justify-center" style={{ gap: 'var(--space-6)' }}>
-                      {/* Avatar */}
-                      <div className="relative">
-                        <div 
-                          className="rounded-full overflow-hidden border-2 border-amber-400/50"
-                          style={{ width: '64px', height: '64px' }}
-                        >
-                          <Image 
-                            src={currentTestimonial.avatar}
-                            alt={currentTestimonial.name}
-                            width={64}
-                            height={64}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Details */}
-                      <div className="text-center md:text-left">
-                        <h4 className="text-white font-bold text-lg" style={{ marginBottom: 'var(--space-1)' }}>{currentTestimonial.name}</h4>
-                        <p className="text-white/60 text-sm font-light">{currentTestimonial.location}</p>
-                        <div className="text-xs text-white/50" style={{ marginTop: 'var(--space-1)' }}>
-                          {currentTestimonial.date} • {currentTestimonial.vehicleCategory}
-                        </div>
+                    {/* Client Info - Centralized */}
+                    <div className="text-center">
+                      <h4 className="text-white font-bold text-lg" style={{ marginBottom: 'var(--space-1)' }}>{currentTestimonial.name}</h4>
+                      <p className="text-white/60 text-sm font-light">{currentTestimonial.location}</p>
+                      <div className="text-xs text-white/50" style={{ marginTop: 'var(--space-1)' }}>
+                        {currentTestimonial.date} • {currentTestimonial.vehicleCategory}
                       </div>
                     </div>
                   </div>

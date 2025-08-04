@@ -436,9 +436,9 @@ export default function PriceCalculatorSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              RESERVE SEU{' '}
+              RESERVE AGORA{' '}
               <span className="text-transparent bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 bg-clip-text">
-                VEÍCULO IDEAL
+                COM A ASX
               </span>
             </motion.h2>
             
