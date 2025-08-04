@@ -1037,28 +1037,30 @@ export default function DiferenciaisSection() {
                   Descubra o veículo perfeito para sua experiência em Orlando. Desde econômicos até luxuosos, todos com seguro completo e quilometragem ilimitada.
                 </p>
                 
-                {/* Premium CTA */}
-                <motion.div
-                  className="inline-flex items-center bg-amber-500 hover:bg-amber-400 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden"
+                {/* Premium CTA - Matching Specialist Button Style */}
+                <motion.button
+                  className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden shadow-2xl"
                   style={{ 
                     padding: 'var(--space-4) var(--space-10)',
                     gap: 'var(--space-3)',
-                    borderRadius: '8px'
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(245,158,11,0.4), 0 4px 16px rgba(245,158,11,0.2)'
                   }}
-                  whileHover={{ 
-                    scale: 1.05,
-                    y: -3,
-                    transition: { type: 'spring', stiffness: 400, damping: 17 }
-                  }}
-                  whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     document.getElementById('categorias')?.scrollIntoView({ behavior: 'smooth' });
                   }}
+                  whileHover={{ 
+                    scale: 1.08,
+                    y: -6,
+                    boxShadow: '0 12px 40px rgba(245,158,11,0.5), 0 6px 20px rgba(245,158,11,0.3)',
+                    transition: { type: 'spring', stiffness: 400, damping: 17 }
+                  }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <span className="relative z-10">Ver Categorias de Veículos</span>
+                  <span className="relative z-10 font-black">Ver Categorias de Veículos</span>
                   <ArrowRight className="w-5 h-5 relative z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                </motion.div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
+                </motion.button>
               </div>
 
               {/* Mobile Layout - Compact Design */}
@@ -1079,23 +1081,30 @@ export default function DiferenciaisSection() {
                   Econômicos até luxuosos. Seguro completo e quilometragem ilimitada.
                 </p>
                 
-                {/* Mobile CTA - Touch Optimized */}
-                <motion.div
-                  className="inline-flex items-center bg-amber-500 hover:bg-amber-400 text-black font-bold text-sm sm:text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer"
+                {/* Premium CTA - Matching Specialist Button Style */}
+                <motion.button
+                  className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-sm sm:text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden shadow-2xl"
                   style={{ 
-                    padding: 'var(--space-3) var(--space-6)',
-                    gap: 'var(--space-2)',
-                    borderRadius: '8px'
+                    padding: 'var(--space-3) var(--space-8)',
+                    gap: 'var(--space-3)',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(245,158,11,0.4), 0 4px 16px rgba(245,158,11,0.2)'
                   }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   onClick={() => {
                     document.getElementById('categorias')?.scrollIntoView({ behavior: 'smooth' });
                   }}
+                  whileHover={{ 
+                    scale: 1.08,
+                    y: -6,
+                    boxShadow: '0 12px 40px rgba(245,158,11,0.5), 0 6px 20px rgba(245,158,11,0.3)',
+                    transition: { type: 'spring', stiffness: 400, damping: 17 }
+                  }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <span>Ver Veículos</span>
-                  <ArrowRight className="w-4 h-4" />
-                </motion.div>
+                  <span className="relative z-10 font-black">Ver Veículos</span>
+                  <ArrowRight className="w-5 h-5 relative z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
+                </motion.button>
               </div>
             </motion.article>
             </div>

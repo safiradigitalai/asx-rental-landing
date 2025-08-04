@@ -100,9 +100,40 @@ export default function VehicleCategoriesSection() {
     }
   ];
 
-  const handleCategorySelect = () => {
-    // Scroll to calculator section
-    document.getElementById('calculadora')?.scrollIntoView({ behavior: 'smooth' });
+  const handleCategorySelect = (category: VehicleCategory) => {
+    // Map vehicle category IDs to calculator category keys
+    const categoryMap: Record<string, string> = {
+      'esportivo': 'Esportivo',
+      'minivan-luxo': 'Minivan Luxo',
+      'minivan-regular': 'Minivan Regular',
+      'sedan': 'Sedan',
+      'suv': 'SUV',
+      'suburban': 'SUV Luxo'
+    };
+
+    // Dispatch custom event to pre-select category in calculator with delay
+    const calculatorCategory = categoryMap[category.id];
+    if (calculatorCategory) {
+      // First scroll, then select after user sees the step
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('selectVehicleCategory', {
+          detail: {
+            category: calculatorCategory,
+            // Remove passengers auto-selection - user should choose manually
+            origem: 'categoria',
+            delay: true // Flag to indicate this should have visual animation
+          }
+        }));
+      }, 800); // Delay to allow scroll completion
+    }
+
+    // Scroll directly to step 1 (vehicle selection) in calculator
+    setTimeout(() => {
+      document.getElementById('calculator-step-1')?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 100);
   };
 
   // Função para calcular a posição de scroll para centralizar um card
@@ -345,7 +376,7 @@ export default function VehicleCategoriesSection() {
                 scale: 1.02,
                 transition: { type: 'spring', stiffness: 300, damping: 20 }
               }}
-              onClick={() => handleCategorySelect()}
+              onClick={() => handleCategorySelect(category)}
             >
               {/* Clean Premium Background */}
               <motion.div 
@@ -511,7 +542,7 @@ export default function VehicleCategoriesSection() {
                     scale: 1.05,
                     transition: { type: 'spring', stiffness: 300, damping: 20 }
                   }}
-                  onClick={handleCategorySelect}
+                  onClick={() => handleCategorySelect(category)}
                 >
                   {/* Premium Background */}
                   <motion.div 

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { Star, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
+import { Star, MessageSquare } from 'lucide-react';
 
 interface Testimonial {
   id: number;
@@ -302,49 +302,48 @@ export default function TestimonialsSection() {
                 </motion.article>
               </AnimatePresence>
 
-              {/* Navigation Arrows */}
-              <button
-                onClick={prevTestimonial}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:text-amber-300 hover:bg-white/15 transition-all duration-300 cursor-pointer"
-                style={{ 
-                  padding: 'var(--space-3)', 
-                  borderRadius: '12px' 
-                }}
-                aria-label="Depoimento anterior"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              
-              <button
-                onClick={nextTestimonial}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:text-amber-300 hover:bg-white/15 transition-all duration-300 cursor-pointer"
-                style={{ 
-                  padding: 'var(--space-3)', 
-                  borderRadius: '12px' 
-                }}
-                aria-label="Próximo depoimento"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Dots Navigation */}
-        <div className="flex items-center justify-center" style={{ gap: 'var(--space-3)', marginBottom: 'var(--space-8)' }}>
-          {testimonials.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToTestimonial(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer ${
-                index === currentIndex 
-                  ? 'bg-amber-500 scale-125' 
-                  : 'bg-gray-300 hover:bg-gray-400'
-              }`}
-              aria-label={`Ir para depoimento ${index + 1}`}
-            />
-          ))}
-        </div>
+        {/* Enhanced Navigation Indicators - Matching Vehicle Slider Design */}
+        <motion.div 
+          className="flex justify-center items-center"
+          style={{ gap: 'var(--space-4)', marginBottom: 'var(--space-8)' }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          {/* Interactive Dots */}
+          <div className="flex" style={{ gap: 'var(--space-2)' }}>
+            {testimonials.map((_, index) => (
+              <motion.button
+                key={index}
+                className="rounded-full transition-all duration-300 cursor-pointer"
+                style={{
+                  width: index === currentIndex ? '24px' : '8px',
+                  height: '8px',
+                  background: index === currentIndex 
+                    ? 'linear-gradient(135deg, #F59E0B, #FBBF24)' 
+                    : 'rgba(156, 163, 175, 0.4)',
+                  boxShadow: index === currentIndex 
+                    ? '0 4px 12px rgba(245,158,11,0.3)'
+                    : 'none'
+                }}
+                onClick={() => goToTestimonial(index)}
+                whileHover={{ 
+                  scale: 1.2,
+                  background: index === currentIndex 
+                    ? 'linear-gradient(135deg, #F59E0B, #FBBF24)' 
+                    : 'rgba(156, 163, 175, 0.6)'
+                }}
+                whileTap={{ scale: 0.9 }}
+                aria-label={`Ir para depoimento ${index + 1}`}
+              />
+            ))}
+          </div>
+        </motion.div>
 
         {/* Statistics - Redesigned */}
         <motion.section
@@ -440,10 +439,10 @@ export default function TestimonialsSection() {
               <div className="relative z-10 text-white">
                 {/* Title */}
                 <motion.h3 
-                  className="leading-tight" 
+                  className="text-editorial-sm md:text-editorial-md leading-tight tracking-tighter" 
                   style={{ 
-                    fontSize: 'clamp(1.5rem, 6vw, 4rem)',
-                    marginBottom: 'clamp(0.75rem, 2vw, var(--space-4))'
+                    marginBottom: 'clamp(0.75rem, 2vw, var(--space-4))',
+                    fontFamily: 'ui-serif, Georgia, serif'
                   }}
                 >
                   PRONTO PARA CRIAR{' '}
@@ -466,25 +465,27 @@ export default function TestimonialsSection() {
                 
                 {/* CTA Button */}
                 <motion.button
-                  className="inline-flex items-center bg-amber-500 hover:bg-amber-400 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden"
+                  className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden shadow-2xl"
                   style={{ 
                     padding: 'clamp(0.875rem, 3vw, var(--space-4)) clamp(1.25rem, 5vw, var(--space-10))',
                     borderRadius: '8px',
-                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)'
+                    fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
+                    boxShadow: '0 8px 32px rgba(245,158,11,0.4), 0 4px 16px rgba(245,158,11,0.2)'
                   }}
                   onClick={() => scrollToSection('calculadora')}
                   whileHover={{ 
-                    scale: 1.05,
-                    y: -3,
+                    scale: 1.08,
+                    y: -6,
+                    boxShadow: '0 12px 40px rgba(245,158,11,0.5), 0 6px 20px rgba(245,158,11,0.3)',
                     transition: { type: 'spring', stiffness: 400, damping: 17 }
                   }}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <span className="relative z-10">
+                  <span className="relative z-10 font-black">
                     <span className="hidden xs:inline">Começar Minha Aventura</span>
                     <span className="xs:hidden">Começar Aventura</span>
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
                 </motion.button>
               </div>
             </motion.article>

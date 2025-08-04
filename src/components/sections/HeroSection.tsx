@@ -69,17 +69,25 @@ export default function HeroSection() {
             <Logo size="lg" variant="light" />
             
             <motion.button
-              className="bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs sm:text-sm tracking-[0.1em] uppercase transition-all duration-400 flex items-center cursor-pointer rounded-md"
+              className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-xs sm:text-sm tracking-[0.1em] uppercase transition-all duration-400 flex items-center cursor-pointer relative overflow-hidden shadow-2xl"
               style={{ 
                 padding: 'var(--space-2) var(--space-3)',
-                gap: 'var(--space-2)'
+                gap: 'var(--space-2)',
+                borderRadius: '8px',
+                boxShadow: '0 4px 16px rgba(245,158,11,0.3), 0 2px 8px rgba(245,158,11,0.2)'
               }}
               onClick={() => scrollToSection('calculadora')}
-              whileHover={{ scale: 1.02, y: -1 }}
+              whileHover={{ 
+                scale: 1.05, 
+                y: -2,
+                boxShadow: '0 6px 20px rgba(245,158,11,0.4), 0 3px 10px rgba(245,158,11,0.3)',
+                transition: { type: 'spring', stiffness: 400, damping: 17 }
+              }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="hidden sm:inline">Faça sua Reserva</span>
-              <span className="sm:hidden">Reservar</span>
+              <span className="hidden sm:inline relative z-10 font-black">Faça sua Reserva</span>
+              <span className="sm:hidden relative z-10 font-black">Reservar</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-600" />
             </motion.button>
           </div>
         </div>
@@ -192,31 +200,39 @@ export default function HeroSection() {
                 transition={{ duration: 0.8, delay: 1.4 }}
               >
                 <motion.button
-                  className="group relative bg-amber-500 hover:bg-amber-400 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 flex items-center justify-center overflow-hidden cursor-pointer"
+                  className="group relative bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 flex items-center justify-center overflow-hidden cursor-pointer shadow-2xl"
                   style={{ 
                     padding: 'var(--space-3) var(--space-8)',
-                    gap: 'var(--space-3)'
+                    gap: 'var(--space-3)',
+                    borderRadius: '8px',
+                    boxShadow: '0 8px 32px rgba(245,158,11,0.4), 0 4px 16px rgba(245,158,11,0.2)'
                   }}
                   onClick={() => scrollToSection('categorias')}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ 
+                    scale: 1.08, 
+                    y: -6,
+                    boxShadow: '0 12px 40px rgba(245,158,11,0.5), 0 6px 20px rgba(245,158,11,0.3)',
+                    transition: { type: 'spring', stiffness: 400, damping: 17 }
+                  }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <span className="relative z-10">Ver Veículos</span>
+                  <span className="relative z-10 font-black">Ver Veículos</span>
                   <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
                 </motion.button>
                 
                 <motion.button
                   className="group border-2 border-white/80 hover:border-white text-white hover:bg-white hover:text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 flex items-center justify-center cursor-pointer"
                   style={{ 
                     padding: 'var(--space-3) var(--space-8)',
-                    gap: 'var(--space-3)'
+                    gap: 'var(--space-3)',
+                    borderRadius: '8px'
                   }}
                   onClick={() => scrollToSection('calculadora')}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <span>Calcular Preço</span>
+                  <span>Fazer Reserva Agora</span>
                 </motion.button>
               </motion.section>
             </div>

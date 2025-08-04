@@ -11,7 +11,6 @@ import {
   CheckCircle, 
   Shield, 
   ArrowRight, 
-  Clock, 
   Sparkles,
   MessageCircle,
   AlertCircle,
@@ -71,27 +70,85 @@ export default function PriceCalculatorSection() {
     }
   };
 
+  // Listen for vehicle category selection from other sections
+  useEffect(() => {
+    const handleVehicleSelection = (event: CustomEvent) => {
+      const { category, delay } = event.detail;
+      
+      if (delay) {
+        // Coming from vehicle cards section - use long delay with animation
+        setIsExternalSelection(true);
+        
+        const categoryButton = document.querySelector(`[data-category="${category}"]`);
+        if (categoryButton) {
+          // Add dramatic highlight animation
+          categoryButton.style.transform = 'scale(1.08)';
+          categoryButton.style.boxShadow = '0 0 30px rgba(245,158,11,0.6)';
+          categoryButton.style.transition = 'all 0.4s ease-out';
+          categoryButton.style.zIndex = '10';
+          
+          // Flash effect
+          setTimeout(() => {
+            categoryButton.style.transform = 'scale(1.03)';
+            categoryButton.style.boxShadow = '0 0 20px rgba(245,158,11,0.4)';
+          }, 200);
+          
+          setTimeout(() => {
+            categoryButton.style.transform = 'scale(1)';
+            categoryButton.style.boxShadow = '';
+            categoryButton.style.zIndex = '';
+          }, 600);
+        }
+        
+        // Long delay for animation from vehicle cards
+        setTimeout(() => {
+          setSelectedCategory(category);
+        }, 700);
+      } else {
+        // Direct selection in calculator - immediate response
+        setIsExternalSelection(false);
+        setSelectedCategory(category);
+      }
+      
+      // Reset step to show the category selection is complete
+      setStep(1);
+    };
+
+    window.addEventListener('selectVehicleCategory', handleVehicleSelection as EventListener);
+
+    return () => {
+      window.removeEventListener('selectVehicleCategory', handleVehicleSelection as EventListener);
+    };
+  }, []);
+
+  // Track if selection came from external source (vehicle cards)
+  const [isExternalSelection, setIsExternalSelection] = useState(false);
+
   // Auto-advance steps based on completion with smooth scroll
   useEffect(() => {
     if (selectedCategory && step === 1) {
+      // Use different timing based on selection origin
+      const delay = isExternalSelection ? 1500 : 800; // Long delay for external, normal for direct
       setTimeout(() => {
         setStep(2);
         setTimeout(() => scrollToStep(2), 100);
-      }, 800);
+        // Reset external selection flag after use
+        setIsExternalSelection(false);
+      }, delay);
     }
     if (checkInDate && checkOutDate && step === 2) {
       setTimeout(() => {
         setStep(3);
         setTimeout(() => scrollToStep(3), 100);
-      }, 600);
+      }, 600); // Back to normal timing
     }
     if (passengers > 0 && step === 3) {
       setTimeout(() => {
         setStep(4);
         setTimeout(() => scrollToStep(4), 100);
-      }, 600);
+      }, 600); // Back to normal timing
     }
-  }, [selectedCategory, checkInDate, checkOutDate, passengers, step]);
+  }, [selectedCategory, checkInDate, checkOutDate, passengers, step, isExternalSelection]);
 
 
   const calculateTotal = () => {
@@ -555,6 +612,7 @@ export default function PriceCalculatorSection() {
                           {categories.map((category, index) => (
                           <motion.button
                             key={category.key}
+                            data-category={category.key}
                             className={`relative overflow-hidden transition-all duration-300 text-left group cursor-pointer ${
                               selectedCategory === category.key
                                 ? 'bg-gradient-to-br from-amber-500/15 to-amber-400/8 border-2 border-amber-400/50 text-white'
@@ -640,6 +698,7 @@ export default function PriceCalculatorSection() {
                             {popularCategories.map((category, index) => (
                             <motion.button
                               key={category.key}
+                              data-category={category.key}
                               className={`relative overflow-hidden transition-all duration-300 text-left group cursor-pointer ${
                                 selectedCategory === category.key
                                   ? 'bg-gradient-to-br from-amber-500/15 to-amber-400/8 border-2 border-amber-400/50 text-white'
@@ -738,6 +797,7 @@ export default function PriceCalculatorSection() {
                                 {otherCategories.map((category, index) => (
                                   <motion.button
                                     key={category.key}
+                                    data-category={category.key}
                                     className={`relative overflow-hidden transition-all duration-300 text-left group cursor-pointer ${
                                       selectedCategory === category.key
                                         ? 'bg-gradient-to-br from-amber-500/15 to-amber-400/8 border-2 border-amber-400/50 text-white'
@@ -890,15 +950,6 @@ export default function PriceCalculatorSection() {
                               <div className="text-blue-300 text-sm font-medium">
                                 Passo 2 de 4
                               </div>
-                              <motion.button
-                                className="text-amber-300 text-sm font-medium hover:text-amber-200 transition-colors flex items-center gap-2"
-                                onClick={() => setShowQuickDates(!showQuickDates)}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                              >
-                                <Clock className="w-4 h-4" />
-                                Seleção Rápida
-                              </motion.button>
                             </div>
                           </div>
 
@@ -1241,7 +1292,7 @@ export default function PriceCalculatorSection() {
                                 { label: 'Passageiros', value: `${passengers} ${passengers === 1 ? 'pessoa' : 'pessoas'}`, icon: Users, color: 'text-purple-300' },
                                 { label: 'Check-in', value: new Date(checkInDate + 'T12:00:00').toLocaleDateString('pt-BR'), icon: Calendar, color: 'text-green-300' },
                                 { label: 'Check-out', value: new Date(checkOutDate + 'T12:00:00').toLocaleDateString('pt-BR'), icon: Calendar, color: 'text-red-300' },
-                                { label: 'Período', value: `${days} ${days === 1 ? 'dia' : 'dias'}`, icon: Clock, color: 'text-blue-300' },
+                                { label: 'Período', value: `${days} ${days === 1 ? 'dia' : 'dias'}`, icon: Calendar, color: 'text-blue-300' },
                                 { label: 'Diária', value: `$${daily.toFixed(2)}`, icon: CreditCard, color: 'text-amber-300' }
                               ].map((item, index) => (
                                 <motion.div 
@@ -1634,7 +1685,7 @@ export default function PriceCalculatorSection() {
                               {[
                                 { label: window.innerWidth <= 420 ? 'Categoria' : 'Categoria do Veículo', value: selectedCategory, icon: Car, color: 'amber' },
                                 { label: window.innerWidth <= 420 ? 'Passageiros' : 'Número de Passageiros', value: `${passengers} ${passengers === 1 ? 'pessoa' : 'pessoas'}`, icon: Users, color: 'amber' },
-                                { label: window.innerWidth <= 420 ? 'Período' : 'Período da Locação', value: `${days} ${days === 1 ? 'dia' : 'dias'}`, icon: Clock, color: 'amber' },
+                                { label: window.innerWidth <= 420 ? 'Período' : 'Período da Locação', value: `${days} ${days === 1 ? 'dia' : 'dias'}`, icon: Calendar, color: 'amber' },
                                 { label: window.innerWidth <= 420 ? 'Retirada' : 'Data de Retirada', value: new Date(checkInDate + 'T12:00:00').toLocaleDateString('pt-BR'), icon: Calendar, color: 'emerald' },
                                 { label: window.innerWidth <= 420 ? 'Devolução' : 'Data de Devolução', value: new Date(checkOutDate + 'T12:00:00').toLocaleDateString('pt-BR'), icon: Calendar, color: 'emerald' },
                                 { label: window.innerWidth <= 420 ? 'Diária' : 'Valor da Diária', value: window.innerWidth <= 420 ? `$${daily.toFixed(2)}` : `$${daily.toFixed(2)} USD`, icon: CreditCard, color: 'emerald' }
@@ -1921,51 +1972,53 @@ export default function PriceCalculatorSection() {
                     </div>
                   )}
                   
-                  {/* Editorial Benefits Section */}
-                  <motion.article 
-                    className="relative overflow-hidden"
-                    style={{ 
-                      padding: 'var(--space-8)',
-                      borderRadius: '20px',
-                      marginTop: 'var(--space-10)'
-                    }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
-                  >
-                    {/* Benefits Background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/12 to-emerald-400/8 border border-emerald-400/25" />
-                    
-                    <div className="relative z-10">
-                      <h3 className="text-title text-emerald-300 font-bold tracking-tight flex items-center" style={{ gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
-                        <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-emerald-300 rounded-lg flex items-center justify-center">
-                          <Shield className="w-4 h-4 text-black" />
-                        </div>
-                        Seus Benefícios ASX
-                      </h3>
+                  {/* Editorial Benefits Section - Only show in step 1 */}
+                  {modalStep === 1 && (
+                    <motion.article 
+                      className="relative overflow-hidden"
+                      style={{ 
+                        padding: 'var(--space-8)',
+                        borderRadius: '20px',
+                        marginTop: 'var(--space-10)'
+                      }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.6 }}
+                    >
+                      {/* Benefits Background */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/12 to-emerald-400/8 border border-emerald-400/25" />
                       
-                      <div className="magazine-grid" style={{ gap: 'var(--space-4)' }}>
-                        {[
-                          { text: 'Pagamento só após receber o veículo', icon: CreditCard },
-                          { text: 'Zero bloqueio no cartão de crédito', icon: Shield },
-                          { text: 'Quilometragem 100% ilimitada', icon: CheckCircle },
-                          { text: 'Suporte 24/7 em português', icon: MessageCircle }
-                        ].map((benefit, index) => {
-                          const Icon = benefit.icon;
-                          return (
-                            <div key={index} className="col-span-12 lg:col-span-6">
-                              <div className="flex items-center" style={{ gap: 'var(--space-3)' }}>
-                                <div className="w-6 h-6 bg-emerald-400/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                  <Icon className="w-3 h-3 text-emerald-300" />
+                      <div className="relative z-10">
+                        <h3 className="text-title text-emerald-300 font-bold tracking-tight flex items-center" style={{ gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
+                          <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-emerald-300 rounded-lg flex items-center justify-center">
+                            <Shield className="w-4 h-4 text-black" />
+                          </div>
+                          Seus Benefícios ASX
+                        </h3>
+                        
+                        <div className="magazine-grid" style={{ gap: 'var(--space-4)' }}>
+                          {[
+                            { text: 'Pagamento só após receber o veículo', icon: CreditCard },
+                            { text: 'Zero bloqueio no cartão de crédito', icon: Shield },
+                            { text: 'Quilometragem 100% ilimitada', icon: CheckCircle },
+                            { text: 'Suporte 24/7 em português', icon: MessageCircle }
+                          ].map((benefit, index) => {
+                            const Icon = benefit.icon;
+                            return (
+                              <div key={index} className="col-span-12 lg:col-span-6">
+                                <div className="flex items-center" style={{ gap: 'var(--space-3)' }}>
+                                  <div className="w-6 h-6 bg-emerald-400/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Icon className="w-3 h-3 text-emerald-300" />
+                                  </div>
+                                  <span className="text-white/85 font-medium text-sm">{benefit.text}</span>
                                 </div>
-                                <span className="text-white/85 font-medium text-sm">{benefit.text}</span>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  </motion.article>
+                    </motion.article>
+                  )}
                   
                   {/* Editorial Action Buttons */}
                   <motion.div 
