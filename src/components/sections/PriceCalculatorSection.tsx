@@ -21,7 +21,7 @@ import { differenceInDays, addDays, format } from 'date-fns';
 import { dailyPrices } from '@/lib/supabase';
 
 export default function PriceCalculatorSection() {
-  const [selectedCategory, setSelectedCategory] = useState<keyof typeof dailyPrices>('Sedan');
+  const [selectedCategory, setSelectedCategory] = useState<keyof typeof dailyPrices | ''>('');
   const [checkInDate, setCheckInDate] = useState('');
   const [checkOutDate, setCheckOutDate] = useState('');
   const [passengers, setPassengers] = useState(0);
@@ -46,22 +46,56 @@ export default function PriceCalculatorSection() {
     { label: '1 mês', days: 30 }
   ];
 
-  // Auto-advance steps based on completion
+  // Enhanced smooth scroll to step function with offset
+  const scrollToStep = (stepNumber: number) => {
+    const stepElement = document.getElementById(`calculator-step-${stepNumber}`);
+    if (stepElement) {
+      // Different offset for mobile vs desktop
+      const isMobile = window.innerWidth < 768;
+      const yOffset = isMobile ? -100 : -120;
+      const y = stepElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      
+      window.scrollTo({ 
+        top: y, 
+        behavior: 'smooth' 
+      });
+      
+      // Add visual feedback pulse to the step (more subtle on mobile)
+      setTimeout(() => {
+        stepElement.style.transform = isMobile ? 'scale(1.01)' : 'scale(1.02)';
+        stepElement.style.transition = 'transform 0.3s ease-out';
+        setTimeout(() => {
+          stepElement.style.transform = 'scale(1)';
+        }, 300);
+      }, 500);
+    }
+  };
+
+  // Auto-advance steps based on completion with smooth scroll
   useEffect(() => {
     if (selectedCategory && step === 1) {
-      setStep(2);
+      setTimeout(() => {
+        setStep(2);
+        setTimeout(() => scrollToStep(2), 100);
+      }, 800);
     }
     if (checkInDate && checkOutDate && step === 2) {
-      setStep(3);
+      setTimeout(() => {
+        setStep(3);
+        setTimeout(() => scrollToStep(3), 100);
+      }, 600);
     }
     if (passengers > 0 && step === 3) {
-      setStep(4);
+      setTimeout(() => {
+        setStep(4);
+        setTimeout(() => scrollToStep(4), 100);
+      }, 600);
     }
   }, [selectedCategory, checkInDate, checkOutDate, passengers, step]);
 
 
   const calculateTotal = () => {
-    if (!checkInDate || !checkOutDate) return { days: 0, total: 0, daily: 0 };
+    if (!checkInDate || !checkOutDate || !selectedCategory) return { days: 0, total: 0, daily: 0 };
     
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
@@ -70,7 +104,7 @@ export default function PriceCalculatorSection() {
     if (checkOut <= checkIn) return { days: 0, total: 0, daily: 0 };
     
     const days = differenceInDays(checkOut, checkIn);
-    const daily = dailyPrices[selectedCategory] || 0;
+    const daily = dailyPrices[selectedCategory as keyof typeof dailyPrices] || 0;
     const total = daily * Math.max(days, 1);
     
     return { 
@@ -156,14 +190,26 @@ export default function PriceCalculatorSection() {
     }
   };
 
+  // Scroll modal to form start
+  const scrollToFormStart = () => {
+    const modalContent = document.querySelector('.modal-content');
+    const modalHeader = document.querySelector('.modal-header');
+    if (modalContent && modalHeader) {
+      const headerHeight = modalHeader.offsetHeight;
+      modalContent.scrollTo({ top: headerHeight, behavior: 'smooth' });
+    }
+  };
+
   // Move to client data step
   const proceedToClientData = () => {
     setModalStep(2);
+    setTimeout(scrollToFormStart, 100);
   };
 
   // Go back to summary
   const backToSummary = () => {
     setModalStep(1);
+    setTimeout(scrollToFormStart, 100);
   };
 
   // Validate client data
@@ -206,7 +252,7 @@ export default function PriceCalculatorSection() {
       `• WhatsApp: ${clientPhone}\n` +
       `• Email: ${clientEmail}\n\n` +
       `🚙 *DETALHES DA RESERVA*\n` +
-      `• Veículo: ${categoryDetails[selectedCategory] || selectedCategory}\n` +
+      `• Veículo: ${selectedCategory ? (categoryDetails[selectedCategory as keyof typeof categoryDetails] || selectedCategory) : 'Não selecionado'}\n` +
       `• Passageiros: ${passengers} ${passengers === 1 ? 'pessoa' : 'pessoas'}\n` +
       `• Cadeirinha: ${needsCarSeat ? `Sim (${carSeatQuantity}x)` : 'Não necessário'}\n\n` +
       `📅 *PERÍODO DA LOCAÇÃO*\n` +
@@ -397,39 +443,73 @@ export default function PriceCalculatorSection() {
 
                   {/* Step Progress Indicators */}
                   <motion.div 
-                    className="flex justify-center items-center mb-8"
+                    className="flex justify-center items-center mb-8 sticky top-4 z-20 bg-black/80 backdrop-blur-md rounded-2xl border border-white/10"
+                    style={{ padding: 'var(--space-4)' }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
                       {[
-                        { num: 1, label: 'Veículo', icon: Car, active: step >= 1 },
-                        { num: 2, label: 'Datas', icon: Calendar, active: step >= 2 },
-                        { num: 3, label: 'Pessoas', icon: Users, active: step >= 3 },
-                        { num: 4, label: 'Orçamento', icon: Calculator, active: step >= 4 }
+                        { num: 1, label: 'Veículo', icon: Car, active: step >= 1, current: step === 1 },
+                        { num: 2, label: 'Datas', icon: Calendar, active: step >= 2, current: step === 2 },
+                        { num: 3, label: 'Pessoas', icon: Users, active: step >= 3, current: step === 3 },
+                        { num: 4, label: 'Orçamento', icon: Calculator, active: step >= 4, current: step === 4 }
                       ].map((stepItem, index) => (
                         <motion.div
                           key={stepItem.num}
                           className="flex items-center gap-2"
                           whileHover={{ scale: 1.05 }}
                         >
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                            stepItem.active 
-                              ? 'bg-amber-400 border-amber-400 text-black' 
-                              : 'bg-white/10 border-white/30 text-white/60'
-                          }`}>
-                            <stepItem.icon className="w-5 h-5" />
-                          </div>
-                          <span className={`text-sm font-medium hidden sm:block ${
+                          <motion.div 
+                            className={`relative w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${
+                              stepItem.active 
+                                ? 'bg-amber-400 border-amber-400 text-black shadow-lg shadow-amber-400/30' 
+                                : 'bg-white/10 border-white/30 text-white/60'
+                            }`}
+                            animate={stepItem.current ? { 
+                              scale: [1, 1.1, 1],
+                              boxShadow: stepItem.active 
+                                ? ['0 0 0 rgba(245,158,11,0.3)', '0 0 20px rgba(245,158,11,0.6)', '0 0 0 rgba(245,158,11,0.3)']
+                                : 'none'
+                            } : {}}
+                            transition={{ 
+                              duration: 2, 
+                              repeat: stepItem.current ? Infinity : 0,
+                              ease: 'easeInOut'
+                            }}
+                          >
+                            <stepItem.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                            {stepItem.current && stepItem.active && (
+                              <motion.div
+                                className="absolute inset-0 rounded-full border-2 border-amber-300"
+                                animate={{
+                                  scale: [1, 1.4, 1],
+                                  opacity: [0.8, 0, 0.8]
+                                }}
+                                transition={{
+                                  duration: 2,
+                                  repeat: Infinity,
+                                  ease: 'easeInOut'
+                                }}
+                              />
+                            )}
+                          </motion.div>
+                          <span className={`text-xs sm:text-sm font-medium hidden sm:block transition-colors duration-300 ${
                             stepItem.active ? 'text-amber-300' : 'text-white/60'
                           }`}>
                             {stepItem.label}
                           </span>
                           {index < 3 && (
-                            <div className={`w-8 h-px mx-2 ${
-                              step > stepItem.num ? 'bg-amber-400' : 'bg-white/20'
-                            }`} />
+                            <motion.div 
+                              className={`w-4 sm:w-8 h-px mx-1 sm:mx-2 transition-all duration-500 ${
+                                step > stepItem.num ? 'bg-amber-400' : 'bg-white/20'
+                              }`}
+                              animate={{
+                                scaleX: step > stepItem.num ? 1 : 0.3
+                              }}
+                              transition={{ duration: 0.5, ease: 'easeInOut' }}
+                            />
                           )}
                         </motion.div>
                       ))}
@@ -437,6 +517,7 @@ export default function PriceCalculatorSection() {
                   </motion.div>
                   {/* Category Selection */}
                   <motion.div 
+                    id="calculator-step-1"
                     className="editorial-rhythm"
                     style={{ marginBottom: 'var(--space-2)' }}
                     initial={{ opacity: 0, y: 30 }}
@@ -446,8 +527,21 @@ export default function PriceCalculatorSection() {
                   >
                     <div className="editorial-stack-lg">
                       <div className="flex items-center justify-between">
-                        <div className="text-white font-semibold text-xl tracking-wide">
-                          Escolha seu Veículo Ideal
+                        <div>
+                          <div className="text-white font-semibold text-xl tracking-wide">
+                            Escolha seu Veículo Ideal
+                          </div>
+                          {!selectedCategory && (
+                            <motion.div 
+                              className="text-amber-300/80 text-sm font-light mt-2 flex items-center gap-2"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.6, delay: 0.3 }}
+                            >
+                              <ArrowRight className="w-4 h-4" />
+                              <span>Selecione uma categoria para começar</span>
+                            </motion.div>
+                          )}
                         </div>
                         <div className="text-amber-300 text-sm font-medium">
                           Passo 1 de 4
@@ -461,7 +555,7 @@ export default function PriceCalculatorSection() {
                           {categories.map((category, index) => (
                           <motion.button
                             key={category.key}
-                            className={`relative overflow-hidden transition-all duration-300 text-left group ${
+                            className={`relative overflow-hidden transition-all duration-300 text-left group cursor-pointer ${
                               selectedCategory === category.key
                                 ? 'bg-gradient-to-br from-amber-500/15 to-amber-400/8 border-2 border-amber-400/50 text-white'
                                 : 'bg-white/4 border border-white/15 text-white/85 hover:bg-white/8 hover:border-white/30'
@@ -546,7 +640,7 @@ export default function PriceCalculatorSection() {
                             {popularCategories.map((category, index) => (
                             <motion.button
                               key={category.key}
-                              className={`relative overflow-hidden transition-all duration-300 text-left group ${
+                              className={`relative overflow-hidden transition-all duration-300 text-left group cursor-pointer ${
                                 selectedCategory === category.key
                                   ? 'bg-gradient-to-br from-amber-500/15 to-amber-400/8 border-2 border-amber-400/50 text-white'
                                   : 'bg-white/4 border border-white/15 text-white/85 hover:bg-white/8 hover:border-white/30'
@@ -644,7 +738,7 @@ export default function PriceCalculatorSection() {
                                 {otherCategories.map((category, index) => (
                                   <motion.button
                                     key={category.key}
-                                    className={`relative overflow-hidden transition-all duration-300 text-left group ${
+                                    className={`relative overflow-hidden transition-all duration-300 text-left group cursor-pointer ${
                                       selectedCategory === category.key
                                         ? 'bg-gradient-to-br from-amber-500/15 to-amber-400/8 border-2 border-amber-400/50 text-white'
                                         : 'bg-white/4 border border-white/15 text-white/85 hover:bg-white/8 hover:border-white/30'
@@ -779,6 +873,7 @@ export default function PriceCalculatorSection() {
                   <AnimatePresence>
                     {step >= 2 && (
                       <motion.div 
+                        id="calculator-step-2"
                         className="editorial-rhythm"
                         style={{ marginBottom: 'var(--space-2)' }}
                         initial={{ opacity: 0, y: 30 }}
@@ -1021,6 +1116,7 @@ export default function PriceCalculatorSection() {
                   <AnimatePresence>
                     {step >= 3 && (
                       <motion.div 
+                        id="calculator-step-3"
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -30 }}
@@ -1095,6 +1191,7 @@ export default function PriceCalculatorSection() {
                   <AnimatePresence>
                     {step >= 4 && days > 0 && total > 0 && passengers > 0 && (
                       <motion.div 
+                        id="calculator-step-4"
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -50 }}
@@ -1366,7 +1463,7 @@ export default function PriceCalculatorSection() {
               
               {/* Modal Content */}
               <motion.div
-                className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black border border-white/10 overflow-hidden w-full max-h-[95vh] overflow-y-auto"
+                className="modal-content relative bg-gradient-to-br from-gray-900 via-gray-800 to-black border border-white/10 overflow-hidden w-full max-h-[95vh] overflow-y-auto"
                 style={{ 
                   borderRadius: window.innerWidth <= 420 ? '16px' : '24px',
                   maxWidth: window.innerWidth <= 420 ? '100%' : '64rem',
@@ -1409,12 +1506,12 @@ export default function PriceCalculatorSection() {
                 </motion.button>
                 
                 <div className="relative z-10" style={{ 
-                  padding: window.innerWidth <= 420 ? '2.5rem 0.75rem 1rem 0.75rem' : 'var(--space-12)'
+                  padding: window.innerWidth <= 420 ? '1.25rem 0.75rem 0.5rem 0.75rem' : 'var(--space-6)'
                 }}>
                   {/* Editorial Header */}
                   <motion.header
-                    className="editorial-rhythm text-center"
-                    style={{ marginBottom: 'var(--space-16)' }}
+                    className="modal-header editorial-rhythm text-center"
+                    style={{ marginBottom: 'var(--space-8)' }}
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
@@ -1437,7 +1534,7 @@ export default function PriceCalculatorSection() {
                     {/* Editorial Headline */}
                     <motion.h2 
                       className="text-editorial-md text-white tracking-tighter"
-                      style={{ marginBottom: 'var(--space-4)' }}
+                      style={{ marginBottom: 'var(--space-2)' }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.8, delay: 0.4 }}
@@ -1461,7 +1558,7 @@ export default function PriceCalculatorSection() {
                     
                     {/* Editorial Subtext */}
                     <motion.p 
-                      className="text-lg text-white/75 max-w-2xl mx-auto font-light"
+                      className="text-lg text-white/75 max-w-2xl mx-auto font-light text-center"
                       style={{ lineHeight: '1.6' }}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -1494,7 +1591,7 @@ export default function PriceCalculatorSection() {
                       <motion.article 
                         className="relative overflow-hidden"
                         style={{ 
-                          padding: window.innerWidth <= 420 ? '1rem 0.5rem' : 'var(--space-10)',
+                          padding: window.innerWidth <= 420 ? '0.5rem 0.25rem' : 'var(--space-5)',
                           borderRadius: window.innerWidth <= 420 ? '16px' : '20px'
                         }}
                         initial={{ opacity: 0, y: 30 }}
@@ -1516,7 +1613,7 @@ export default function PriceCalculatorSection() {
                         <div className="relative z-10">
                           <h3 className="text-white font-bold tracking-tight text-center" style={{ 
                             fontSize: window.innerWidth <= 420 ? '1.125rem' : 'clamp(1.125rem, 4vw, 2rem)',
-                            marginBottom: window.innerWidth <= 420 ? '1rem' : 'var(--space-8)'
+                            marginBottom: window.innerWidth <= 420 ? '0.5rem' : 'var(--space-4)'
                           }}>
                             Resumo da Reserva
                           </h3>
@@ -1524,9 +1621,9 @@ export default function PriceCalculatorSection() {
                           {/* Editorial Details Grid */}
                           {/* Mobile-First Simple Layout */}
                           <div style={{ 
-                            display: window.innerWidth <= 420 ? 'block' : 'grid',
-                            gridTemplateColumns: window.innerWidth <= 420 ? '1fr' : '1fr 1fr',
-                            gap: window.innerWidth <= 420 ? '0.75rem' : 'var(--space-8)'
+                            display: window.innerWidth <= 420 ? 'block' : 'block',
+                            maxWidth: window.innerWidth <= 420 ? '100%' : '80%',
+                            margin: window.innerWidth <= 420 ? '0' : '0 auto'
                           }}>
                             {/* Unified Details List - Mobile Optimized */}
                             <div style={{ 
@@ -1568,14 +1665,12 @@ export default function PriceCalculatorSection() {
                               })}
                             </div>
                             
-                            {/* Desktop: Add spacing column */}
-                            {window.innerWidth > 420 && <div></div>}
                           </div>
                           
                           {/* Editorial Total Section */}
                           <div className="bg-gradient-to-r from-emerald-500/15 to-emerald-400/10 border-2 border-emerald-400/30" style={{ 
-                            marginTop: window.innerWidth <= 420 ? '0.75rem' : 'clamp(1rem, 4vw, 2rem)', 
-                            padding: window.innerWidth <= 420 ? '0.75rem' : 'clamp(1rem, 4vw, 1.5rem)', 
+                            marginTop: window.innerWidth <= 420 ? '0.5rem' : 'var(--space-4)', 
+                            padding: window.innerWidth <= 420 ? '0.5rem' : 'var(--space-4)', 
                             borderRadius: window.innerWidth <= 420 ? '12px' : '16px' 
                           }}>
                             <div className="flex items-center justify-between">
@@ -1606,7 +1701,7 @@ export default function PriceCalculatorSection() {
                       <motion.article 
                         className="relative overflow-hidden"
                         style={{ 
-                          padding: window.innerWidth <= 420 ? '1rem 0.5rem' : 'var(--space-10)',
+                          padding: window.innerWidth <= 420 ? '0.5rem 0.25rem' : 'var(--space-5)',
                           borderRadius: window.innerWidth <= 420 ? '16px' : '20px'
                         }}
                         initial={{ opacity: 0, y: 30 }}
@@ -1620,7 +1715,7 @@ export default function PriceCalculatorSection() {
                           <h3 className="text-white font-bold tracking-tight flex items-center" style={{ 
                             fontSize: window.innerWidth <= 420 ? '1rem' : 'clamp(1.125rem, 4vw, 1.5rem)',
                             gap: window.innerWidth <= 420 ? '0.5rem' : 'var(--space-3)', 
-                            marginBottom: window.innerWidth <= 420 ? '1rem' : 'var(--space-8)'
+                            marginBottom: window.innerWidth <= 420 ? '0.5rem' : 'var(--space-4)'
                           }}>
                             <div className="bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl flex items-center justify-center" style={{
                               width: window.innerWidth <= 420 ? '28px' : '40px',
