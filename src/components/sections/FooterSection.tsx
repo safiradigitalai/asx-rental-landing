@@ -112,7 +112,7 @@ export default function FooterSection() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-400 bg-clip-text font-medium">10.000+</span> brasileiros • <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-400 bg-clip-text font-medium">4.9★</span> avaliação
+            <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-400 bg-clip-text font-medium">1.000+</span> brasileiros • <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-400 bg-clip-text font-medium">4.9★</span> avaliação
           </motion.section>
 
         </div>

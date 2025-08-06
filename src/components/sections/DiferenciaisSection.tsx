@@ -23,7 +23,7 @@ interface DiferencialCard {
 
 export default function DiferenciaisSection() {
   // Tags específicas que descrevem cada benefício (na ordem correta dos diferenciais)
-  const customTags = ['Pague na Entrega', 'Cartão Liberado', 'Rode à Vontade', 'Suporte BR', 'Pegue Direto', 'Incluso Grátis'];
+  const customTags = ['Cartão Liberado', 'Rode à Vontade', 'Suporte BR', 'Pegue Direto', 'Incluso Grátis'];
   
   // Estado para controlar o slider
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -33,12 +33,6 @@ export default function DiferenciaisSection() {
   const sliderRef = useRef<HTMLDivElement>(null);
   
   const diferenciais: DiferencialCard[] = [
-    {
-      icon: <CreditCard className="w-6 h-6" />,
-      title: "Pagamento após receber",
-      description: "Você só paga quando estiver com as chaves na mão. Zero risco, máxima segurança.",
-      highlight: true
-    },
     {
       icon: <Shield className="w-6 h-6" />,
       title: "Zero bloqueio no cartão",
@@ -67,8 +61,8 @@ export default function DiferenciaisSection() {
     }
   ];
 
-  // Slides para o mobile (apenas os 5 diferenciais, sem o primeiro que é o hero)
-  const mobileSlides = diferenciais.slice(1);
+  // Slides para o mobile (todos os diferenciais)
+  const mobileSlides = diferenciais;
   const totalSlides = mobileSlides.length;
 
   // Auto-play effect
@@ -318,155 +312,12 @@ export default function DiferenciaisSection() {
 
         {/* Editorial Features Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Featured Differential - Hero Card */}
-          <motion.article
-            className="col-span-12 relative overflow-hidden group cursor-pointer"
-            style={{ marginBottom: 'var(--space-16)', borderRadius: '20px' }}
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
-          >
-            {/* Premium Blue Background Layer */}
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-            />
-            
-            {/* Animated Pattern Overlay */}
-            <motion.div 
-              className="absolute inset-0 opacity-8"
-              animate={{ 
-                backgroundPosition: ['0% 0%', '100% 100%'],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: 'linear'
-              }}
-              style={{
-                backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)',
-                backgroundSize: 'var(--space-6) var(--space-6)'
-              }}
-            />
-            
-            {/* Blue Gradient Overlay for depth */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-300/5" />
-            
-            {/* Desktop Layout */}
-            <motion.div 
-              className="relative z-10 text-white editorial-stack-lg hidden md:block"
-              style={{ padding: 'var(--space-12)' }}
-              whileHover={{ y: -4 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              {/* Premium Badge - Enhanced Blue + Gold */}
-              <motion.div 
-                className="inline-flex items-center backdrop-blur-sm text-xs font-medium tracking-[0.25em] uppercase"
-                style={{ 
-                  gap: 'var(--space-2)', 
-                  padding: 'var(--space-2) var(--space-4)',
-                  marginBottom: 'var(--space-8)',
-                  background: 'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(251,191,36,0.15) 50%, rgba(0,102,204,0.1) 100%)',
-                  border: '1px solid rgba(245,158,11,0.4)',
-                  color: '#FCD34D'
-                }}
-                whileHover={{ 
-                  scale: 1.05, 
-                  backgroundColor: 'rgba(245,158,11,0.25)',
-                  borderColor: 'rgba(251,191,36,0.5)'
-                }}
-              >
-                <CreditCard className="w-4 h-4" />
-                <span>Segurança Total</span>
-              </motion.div>
-              
-              <h3 className="text-editorial-md leading-tight" style={{ marginBottom: 'var(--space-6)' }}>
-                PAGAMENTO SÓ APÓS{' '}
-                <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text">
-                  RECEBER
-                </span>
-              </h3>
-              
-              <p className="text-xl font-light leading-relaxed text-white/85" style={{ 
-                marginBottom: 'var(--space-8)',
-                maxWidth: '500px'
-              }}>
-                Você só paga quando estiver com as chaves na mão. Zero risco, máxima segurança e total tranquilidade para sua viagem.
-              </p>
-              
-              <motion.div 
-                className="flex items-center text-amber-300 font-medium group-hover:text-amber-100 transition-colors duration-300 cursor-pointer"
-                style={{ gap: 'var(--space-3)' }}
-                whileHover={{ x: 8 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                onClick={() => openWhatsAppDiferenciais('Pagamento só após receber')}
-              >
-                <span className="text-base tracking-wide">Descobrir mais vantagens</span>
-                <ArrowRight className="w-5 h-5" />
-              </motion.div>
-            </motion.div>
-
-            {/* Mobile Layout - Compact Design */}
-            <motion.div 
-              className="relative z-10 text-white md:hidden flex flex-col items-center text-center"
-              style={{ 
-                padding: 'var(--space-4) var(--space-4) var(--space-4) var(--space-4)' 
-              }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              {/* Mobile Premium Badge */}
-              <motion.div 
-                className="inline-flex items-center bg-amber-500/20 border border-amber-400/30 backdrop-blur-sm text-amber-300 text-xs font-medium tracking-[0.25em] uppercase"
-                style={{ 
-                  gap: 'var(--space-1)', 
-                  padding: 'var(--space-1) var(--space-3)',
-                  marginBottom: 'var(--space-3)'
-                }}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <CreditCard className="w-3 h-3" />
-                <span>Seguro</span>
-              </motion.div>
-              
-              {/* Mobile Hero Title - Simplified */}
-              <h3 className="text-2xl sm:text-3xl font-bold leading-tight" style={{ marginBottom: 'var(--space-3)' }}>
-                <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text">
-                  PAGAMENTO
-                </span>
-                <br />
-                <span className="text-white">SÓ APÓS RECEBER</span>
-              </h3>
-              
-              {/* Mobile Description - Concise */}
-              <p className="text-sm sm:text-base font-light leading-relaxed text-white/85 max-w-xs" style={{ marginBottom: 'var(--space-4)' }}>
-                Zero risco. Máxima segurança. Você só paga com as chaves na mão.
-              </p>
-              
-              {/* Mobile CTA - Touch Optimized */}
-              <motion.div 
-                className="flex items-center text-amber-300 font-medium text-sm cursor-pointer"
-                style={{ gap: 'var(--space-2)' }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                onClick={() => openWhatsAppDiferenciais('Pagamento só após receber')}
-              >
-                <span className="tracking-wide">Ver mais vantagens</span>
-                <ArrowRight className="w-4 h-4" />
-              </motion.div>
-            </motion.div>
-          </motion.article>
-
           {/* Desktop: Premium Cards Grid / Mobile: Swipe Slider */}
           <div className="col-span-12">
             {/* Desktop Grid - First Row: 2 Large Cards */}
             <div className="hidden lg:block" style={{ marginBottom: 'var(--space-8)' }}>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-                {diferenciais.slice(1, 3).map((diferencial, index) => {
+                {diferenciais.slice(0, 2).map((diferencial, index) => {
                   const isHighlight = diferencial.highlight;
                   return (
                     <motion.article
@@ -539,7 +390,7 @@ export default function DiferenciaisSection() {
                           }}
                         >
                           {diferencial.icon}
-                          <span>{customTags[index + 1]}</span>
+                          <span>{customTags[index]}</span>
                         </div>
                         
                         <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-2)' }}>
@@ -575,7 +426,7 @@ export default function DiferenciaisSection() {
             <div className="hidden lg:block">
               {/* First part: 2 Large Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12" style={{ marginBottom: 'var(--space-8)' }}>
-                {diferenciais.slice(3, 5).map((diferencial, index) => {
+                {diferenciais.slice(2, 4).map((diferencial, index) => {
                   const isHighlight = diferencial.highlight;
                   return (
                     <motion.article
@@ -647,7 +498,7 @@ export default function DiferenciaisSection() {
                           }}
                         >
                           {diferencial.icon}
-                          <span>{customTags[index + 3]}</span>
+                          <span>{customTags[index + 2]}</span>
                         </div>
                         
                         <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-2)' }}>
@@ -680,7 +531,7 @@ export default function DiferenciaisSection() {
               
               {/* Second part: 1 Full Width Card */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-                {diferenciais.slice(5, 6).map((diferencial, index) => {
+                {diferenciais.slice(4, 5).map((diferencial, index) => {
                   const isHighlight = diferencial.highlight;
                   return (
                     <motion.article
@@ -753,7 +604,7 @@ export default function DiferenciaisSection() {
                           }}
                         >
                           {diferencial.icon}
-                          <span>{customTags[5]}</span>
+                          <span>{customTags[4]}</span>
                         </div>
                         
                         <div className="flex-1 editorial-stack" style={{ paddingRight: 'var(--space-2)' }}>
@@ -893,7 +744,7 @@ export default function DiferenciaisSection() {
                             }}
                           >
                             {diferencial.icon}
-                            <span>{customTags[index + 1]}</span>
+                            <span>{customTags[index]}</span>
                           </div>
                         </div>
                         
@@ -979,9 +830,9 @@ export default function DiferenciaisSection() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             <div className="col-span-12 lg:col-span-10 lg:col-start-2">
             <motion.article 
-              className="relative overflow-hidden text-center editorial-stack-lg group cursor-pointer"
+              className="relative overflow-hidden text-center group cursor-pointer"
               style={{ 
-                padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-4)',
+                padding: 'var(--space-1)',
                 borderRadius: '16px'
               }}
               whileHover={{ 
@@ -1019,32 +870,9 @@ export default function DiferenciaisSection() {
               {/* Gradient Overlay for depth */}
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 via-transparent to-amber-300/5" />
               
-              {/* Desktop Layout */}
-              <div className="relative z-10 text-white hidden md:block" style={{ padding: 'var(--space-6)' }}>
-                {/* Editorial Title */}
-                <motion.h3 
-                  className="text-editorial-md leading-tight" 
-                  style={{ marginBottom: 'var(--space-6)' }}
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                >
-                  EXPLORE NOSSA{' '}
-                  <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text">
-                    FROTA
-                  </span>
-                </motion.h3>
-                
-                {/* Editorial Description */}
-                <p className="text-xl text-white/85 font-light" style={{ 
-                  lineHeight: 'var(--baseline)', 
-                  marginBottom: 'var(--space-8)',
-                  maxWidth: '600px',
-                  margin: '0 auto var(--space-8) auto'
-                }}>
-                  Descubra o veículo perfeito para sua experiência em Orlando. Desde econômicos até luxuosos, todos com seguro completo e quilometragem ilimitada.
-                </p>
-                
-                {/* Premium CTA - Matching Specialist Button Style */}
+              {/* Desktop Layout - Clean Button Only */}
+              <div className="relative z-10 text-white hidden md:block flex items-center justify-center" style={{ padding: 'var(--space-4)' }}>
+                {/* Premium CTA - Centered */}
                 <motion.button
                   className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden shadow-2xl"
                   style={{ 
@@ -1070,25 +898,11 @@ export default function DiferenciaisSection() {
                 </motion.button>
               </div>
 
-              {/* Mobile Layout - Compact Design */}
-              <div className="relative z-10 text-white md:hidden flex flex-col items-center text-center" style={{
-                padding: 'var(--space-3) var(--space-4) var(--space-3) var(--space-4)'
+              {/* Mobile Layout - Clean Button Only */}
+              <div className="relative z-10 text-white md:hidden flex items-center justify-center" style={{
+                padding: 'var(--space-3)'
               }}>
-                {/* Mobile Title - Simplified */}
-                <h3 className="text-2xl sm:text-3xl font-bold leading-tight" style={{ marginBottom: 'var(--space-3)' }}>
-                  <span className="text-transparent bg-gradient-to-r from-amber-300 to-amber-100 bg-clip-text">
-                    NOSSA FROTA
-                  </span>
-                  <br />
-                  <span className="text-white">COMPLETA</span>
-                </h3>
-                
-                {/* Mobile Description - Concise */}
-                <p className="text-sm sm:text-base font-light leading-relaxed text-white/85 max-w-xs" style={{ marginBottom: 'var(--space-4)' }}>
-                  Econômicos até luxuosos. Seguro completo e quilometragem ilimitada.
-                </p>
-                
-                {/* Premium CTA - Matching Specialist Button Style */}
+                {/* Premium CTA - Centered */}
                 <motion.button
                   className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-black font-bold text-sm sm:text-base tracking-[0.1em] uppercase transition-all duration-400 cursor-pointer relative overflow-hidden shadow-2xl"
                   style={{ 
@@ -1108,7 +922,7 @@ export default function DiferenciaisSection() {
                   }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <span className="relative z-10 font-black">Ver Veículos</span>
+                  <span className="relative z-10 font-black">Ver Categorias</span>
                   <ArrowRight className="w-5 h-5 relative z-10" />
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
                 </motion.button>

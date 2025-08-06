@@ -334,9 +334,9 @@ export default function VehicleCategoriesSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              ESCOLHA SEU{' '}
+              ESCOLHA SUA{' '}
               <span className="text-transparent bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 bg-clip-text">
-                VEÍCULO IDEAL
+                CATEGORIA IDEAL
               </span>
             </motion.h2>
             
@@ -348,21 +348,20 @@ export default function VehicleCategoriesSection() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              Desde econômicos até premium. Cada veículo com seguro completo, quilometragem ilimitada e atendimento especializado em português.
+              Diferentes categorias para cada necessidade. Econômicos para cidade, familiares espaçosos, esportivos e SUVs. Todos com seguro completo e quilometragem ilimitada.
             </motion.p>
             </div>
           </div>
         </motion.header>
 
-        {/* Desktop Grid - 2 Columns Layout */}
+        {/* Desktop Grid - Category Showcase Cards */}
         <div className="hidden lg:grid lg:grid-cols-12 gap-8 lg:gap-12">
           {categories.map((category, index) => (
             <motion.article
               key={category.id}
-              className="col-span-12 lg:col-span-6 relative overflow-hidden group cursor-pointer"
+              className="col-span-12 lg:col-span-6 relative group cursor-pointer bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
               style={{ 
-                borderRadius: '16px',
-                height: '580px'
+                minHeight: '500px'
               }}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -373,153 +372,112 @@ export default function VehicleCategoriesSection() {
                 ease: [0.6, -0.05, 0.01, 0.99]
               }}
               whileHover={{ 
-                y: -12,
+                y: -8,
                 scale: 1.02,
+                boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
                 transition: { type: 'spring', stiffness: 300, damping: 20 }
               }}
               onClick={() => handleCategorySelect(category)}
             >
-              {/* Vehicle Background Image with Hover Zoom */}
-              <motion.div 
-                className="absolute inset-0 overflow-hidden"
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.6, ease: 'easeOut' }}
-              >
-                <Image
-                  src={category.imageUrl}
-                  alt={`${category.model} ${category.name}`}
-                  fill
-                  className="object-cover object-center opacity-60"
-                  quality={90}
-                />
-              </motion.div>
-
-              {/* Premium Black Background Filter */}
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-800/85 to-black/80"
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.6, ease: 'easeOut' }}
-              />
-
-              {/* Subtle Animated Pattern */}
-              <motion.div 
-                className="absolute inset-0 opacity-[0.06]"
-                animate={{ 
-                  backgroundPosition: ['0% 0%', '100% 100%'],
-                }}
-                transition={{
-                  duration: 30 + (index * 5),
-                  repeat: Infinity,
-                  ease: 'linear'
-                }}
-                style={{
-                  backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(212,165,116,0.4) 1px, transparent 0)',
-                  backgroundSize: 'var(--space-8) var(--space-8)'
-                }}
-              />
-              
-              {/* Blue Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-300/5" />
-
-              {/* Popular Badge - Gold Premium Style */}
-              {category.popular && (
-                <motion.div 
-                  className="absolute top-4 right-4 z-20 inline-flex items-center backdrop-blur-sm text-xs font-medium tracking-[0.25em] uppercase"
-                  style={{ 
-                    gap: 'var(--space-1)', 
-                    padding: 'var(--space-2) var(--space-3)',
-                    borderRadius: '20px',
-                    background: 'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(251,191,36,0.15) 50%, rgba(0,102,204,0.1) 100%)',
-                    border: '1px solid rgba(245,158,11,0.4)',
-                    color: '#FCD34D'
-                  }}
-                  whileHover={{ 
-                    scale: 1.05, 
-                    backgroundColor: 'rgba(245,158,11,0.25)',
-                    borderColor: 'rgba(251,191,36,0.5)'
-                  }}
-                >
-                  <Star className="w-3 h-3 fill-current" />
-                  <span>Popular</span>
-                </motion.div>
-              )}
-
-              {/* Editorial Content Layer */}
+              {/* Vehicle Image */}
               <div 
-                className="relative z-10 h-full flex flex-col justify-center items-center text-white text-center"
-                style={{ padding: 'var(--space-8)' }}
+                className="relative overflow-hidden flex-shrink-0"
+                style={{ height: '280px' }}
               >
-                {/* Content Block - Centralized */}
-                <div className="w-full" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', alignItems: 'center' }}>
-                  {/* Vehicle Category Badge */}
-                  <div 
-                    className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/40 text-amber-200 text-xs font-medium tracking-[0.2em] uppercase"
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                  className="w-full h-full"
+                >
+                  <Image
+                    src={category.imageUrl}
+                    alt={`${category.model} - Categoria ${category.name}`}
+                    fill
+                    className="object-cover object-center"
+                    quality={95}
+                  />
+                </motion.div>
+                
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+                
+                {category.popular && (
+                  <motion.div 
+                    className="absolute top-4 right-4 z-20 inline-flex items-center backdrop-blur-md bg-amber-500/90 text-white text-xs font-bold tracking-[0.2em] uppercase rounded-full"
                     style={{ 
-                      padding: 'var(--space-1) var(--space-3)',
-                      borderRadius: '20px'
+                      gap: 'var(--space-1)', 
+                      padding: 'var(--space-2) var(--space-3)',
+                      boxShadow: '0 4px 12px rgba(245,158,11,0.4)'
+                    }}
+                    initial={{ scale: 0, rotate: -10 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.3 + (index * 0.1), type: 'spring', stiffness: 350, damping: 20 }}
+                  >
+                    <Star className="w-3 h-3 fill-current" />
+                    <span>Popular</span>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Glass Content Box */}
+              <div 
+                className="backdrop-blur-xl bg-white/95 border-t border-white/20 flex-1 flex flex-col"
+                style={{ 
+                  borderRadius: '0 0 16px 16px',
+                  padding: 'var(--space-5)'
+                }}
+              >
+                {/* Top Section - Info */}
+                <div className="flex-1">
+                  <div 
+                    className="inline-flex items-center bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium tracking-[0.2em] uppercase rounded-full"
+                    style={{ 
+                      padding: 'var(--space-2) var(--space-4)',
+                      marginBottom: '2rem'
                     }}
                   >
                     <span>{category.name}</span>
                   </div>
                   
-                  {/* Vehicle Title */}
-                  <h3 className="text-editorial-sm leading-tight">
-                    {category.model.toUpperCase()}
-                  </h3>
-                  
-                  {/* Vehicle Details */}
-                  <p className="text-white/70 text-base font-light">
-                    {category.year} • {category.color}
-                  </p>
-                  
-                  {/* Capacity & Price */}
-                  <div className="flex items-center justify-center w-full" style={{ gap: 'var(--space-6)' }}>
-                    <div className="flex items-center text-base" style={{ gap: 'var(--space-2)' }}>
-                      <Users className="w-5 h-5 text-blue-400" />
-                      <span className="text-white/60">{category.passengers} pessoas</span>
-                    </div>
-                    <div className="font-bold text-xl">
-                      <span className="text-transparent bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200 bg-clip-text">
-                        ${category.dailyPrice}
-                      </span>
-                      <span className="text-blue-200/80 text-sm font-light">/dia</span>
+                  <div style={{ marginBottom: '2rem' }}>
+                    <h3 className="text-xl font-bold text-gray-900 leading-tight" style={{ marginBottom: '0.75rem' }}>
+                      {category.name.toUpperCase()}
+                    </h3>
+                    
+                    <p className="text-gray-500 text-sm font-light" style={{ marginBottom: '1rem' }}>
+                      Exemplo: {category.model} {category.year}
+                    </p>
+                    
+                    <div className="flex items-center text-sm text-gray-600" style={{ gap: 'var(--space-2)' }}>
+                      <Users className="w-4 h-4 text-blue-500" />
+                      <span>Até {category.passengers} pessoas</span>
                     </div>
                   </div>
-                  
-                  {/* Editorial Features List */}
-                  <div>
-                    <div className="text-white/50 text-xs font-medium tracking-[0.15em] uppercase" style={{ marginBottom: 'var(--space-1)' }}>
-                      Características
-                    </div>
-                    <div className="text-white/70 text-sm font-light leading-relaxed">
-                      {category.features.slice(0, 3).join(' • ')}
-                      {category.features.length > 3 && (
-                        <span className="text-white/50"> • +{category.features.length - 3} mais</span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Premium CTA */}
-                  <motion.div 
-                    className="flex items-center text-amber-300 font-medium group-hover:text-amber-100 transition-colors duration-300 cursor-pointer"
-                    style={{ gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}
-                    whileHover={{ x: 8 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                  >
-                    <span className="text-base tracking-wide">Reservar Veículo</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </motion.div>
                 </div>
+                
+                {/* Bottom Section - CTA */}
+                <motion.button 
+                  className="w-full flex items-center justify-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-white font-bold text-sm tracking-wide uppercase rounded-lg cursor-pointer transition-all duration-300"
+                  style={{ 
+                    padding: 'var(--space-3) var(--space-6)',
+                    gap: 'var(--space-2)'
+                  }}
+                  whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: '0 8px 20px rgba(245,158,11,0.3)'
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span>Fazer Reserva</span>
+                  <ArrowRight className="w-4 h-4" />
+                </motion.button>
               </div>
             </motion.article>
           ))}
         </div>
 
-        {/* Mobile: Swipeable Cards */}
+        {/* Mobile: Category Showcase Cards */}
         <div className="lg:hidden">
-          {/* Cards Container */}
           <div className="relative">
-
             {/* Scroll Container */}
             <motion.div 
               ref={scrollRef}
@@ -528,8 +486,8 @@ export default function VehicleCategoriesSection() {
                 gap: 'var(--space-6)', 
                 paddingTop: 'var(--space-4)',
                 paddingBottom: 'var(--space-4)',
-                paddingLeft: 'calc(50vw - 160px)', // Centralizar primeiro card
-                paddingRight: 'calc(50vw - 160px)'  // Centralizar último card
+                paddingLeft: 'calc(50vw - 160px)',
+                paddingRight: 'calc(50vw - 160px)'
               }}
               animate={{
                 opacity: isTransitioning ? 0.8 : 1,
@@ -542,11 +500,10 @@ export default function VehicleCategoriesSection() {
               {categories.map((category, index) => (
                 <motion.article
                   key={category.id}
-                  className="relative overflow-hidden group cursor-pointer flex-shrink-0 snap-center"
+                  className="relative group cursor-pointer flex-shrink-0 snap-center bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
                   style={{ 
-                    width: '320px', // Largura fixa para cálculos precisos
-                    height: '580px',
-                    borderRadius: '20px'
+                    width: '320px',
+                    minHeight: '450px'
                   }}
                   initial={{ opacity: 0, x: 50 }}
                   animate={{ 
@@ -565,146 +522,105 @@ export default function VehicleCategoriesSection() {
                   whileHover={{ 
                     y: -8,
                     scale: 1.05,
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
                     transition: { type: 'spring', stiffness: 300, damping: 20 }
                   }}
                   onClick={() => handleCategorySelect(category)}
                 >
-                  {/* Vehicle Background Image */}
-                  <div className="absolute inset-0">
+                  {/* Vehicle Image Showcase */}
+                  <motion.div 
+                    className="relative overflow-hidden flex-shrink-0"
+                    style={{ height: '200px' }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                  >
                     <Image
                       src={category.imageUrl}
-                      alt={`${category.model} ${category.name}`}
+                      alt={`${category.model} - Categoria ${category.name}`}
                       fill
-                      className="object-cover object-center opacity-40"
-                      quality={90}
+                      className="object-cover object-center"
+                      quality={95}
                     />
-                  </div>
-
-                  {/* Premium Black Background Filter */}
-                  <motion.div 
-                    className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-800/85 to-black/80"
-                    animate={{
-                      boxShadow: index === currentSlide 
-                        ? '0 20px 40px rgba(59,130,246,0.2), 0 8px 25px rgba(245,158,11,0.1)'
-                        : '0 8px 25px rgba(30,58,138,0.15)'
-                    }}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ 
-                      duration: 0.6, 
-                      ease: 'easeOut',
-                      boxShadow: { duration: 0.4, ease: [0.4, 0, 0.2, 1] }
-                    }}
-                  />
-
-                  {/* Animated Pattern */}
-                  <motion.div 
-                    className="absolute inset-0 opacity-[0.06]"
-                    animate={{ 
-                      backgroundPosition: ['0% 0%', '100% 100%'],
-                    }}
-                    transition={{
-                      duration: 30 + (index * 3),
-                      repeat: Infinity,
-                      ease: 'linear'
-                    }}
-                    style={{
-                      backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(212,165,116,0.4) 1px, transparent 0)',
-                      backgroundSize: 'var(--space-8) var(--space-8)'
-                    }}
-                  />
-                  
-                  {/* Blue Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-blue-300/5" />
-
-                  {/* Popular Badge - Gold Premium Style */}
-                  {category.popular && (
-                    <motion.div 
-                      className="absolute top-4 right-4 z-20"
-                      style={{
-                        background: 'linear-gradient(135deg, rgba(245,158,11,0.9) 0%, rgba(251,191,36,0.8) 50%, rgba(0,102,204,0.2) 100%)',
-                        color: 'white',
-                        fontSize: '10px',
-                        fontWeight: '700',
-                        padding: 'var(--space-2) var(--space-3)',
-                        borderRadius: '16px',
-                        boxShadow: '0 6px 20px rgba(245,158,11,0.4)',
-                        letterSpacing: '0.08em',
-                        border: '1px solid rgba(245,158,11,0.3)'
-                      }}
-                      initial={{ scale: 0, rotate: -10 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.3 + (index * 0.1), type: 'spring', stiffness: 350, damping: 20 }}
-                    >
-                      ★ POPULAR
-                    </motion.div>
-                  )}
-
-                  {/* Content */}
-                  <div 
-                    className="relative z-10 h-full flex flex-col justify-center items-center text-white text-center"
-                    style={{ padding: 'var(--space-8)' }}
-                  >
-                    <div className="w-full" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', alignItems: 'center' }}>
-                      {/* Category Badge */}
-                      <div 
-                        className="inline-flex items-center backdrop-blur-sm border bg-amber-500/20 border-amber-400/40 text-amber-200 text-xs font-medium tracking-[0.2em] uppercase"
+                    
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+                    
+                    {/* Popular Badge */}
+                    {category.popular && (
+                      <motion.div 
+                        className="absolute top-3 right-3 z-20 inline-flex items-center backdrop-blur-md bg-amber-500/90 text-white text-xs font-bold tracking-[0.2em] uppercase rounded-full"
                         style={{ 
-                          padding: 'var(--space-2) var(--space-4)',
-                          borderRadius: '20px'
+                          gap: 'var(--space-1)', 
+                          padding: 'var(--space-1) var(--space-2)',
+                          boxShadow: '0 4px 12px rgba(245,158,11,0.4)'
                         }}
+                        initial={{ scale: 0, rotate: -10 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ delay: 0.3 + (index * 0.1), type: 'spring', stiffness: 350, damping: 20 }}
+                      >
+                        <Star className="w-3 h-3 fill-current" />
+                        <span>Popular</span>
+                      </motion.div>
+                    )}
+                  </motion.div>
+
+                  {/* Glass Content Box */}
+                  <motion.div 
+                    className="backdrop-blur-xl bg-white/95 border-t border-white/20 flex-1 flex flex-col"
+                    style={{ 
+                      padding: 'var(--space-4)',
+                      borderRadius: '0 0 16px 16px'
+                    }}
+                    whileHover={{
+                      backgroundColor: 'rgba(255,255,255,0.98)',
+                      transition: { duration: 0.3 }
+                    }}
+                  >
+                    {/* Category Header */}
+                    <div className="flex-1">
+                      <motion.div 
+                        className="inline-flex items-center bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium tracking-[0.2em] uppercase rounded-full self-start"
+                        style={{ 
+                          padding: 'var(--space-1) var(--space-3)',
+                          marginBottom: '1.5rem'
+                        }}
+                        whileHover={{ scale: 1.05 }}
                       >
                         <span>{category.name}</span>
-                      </div>
-                      
-                      {/* Vehicle Title */}
-                      <h3 className="text-editorial-sm leading-tight">
-                        {category.model.toUpperCase()}
-                      </h3>
-                      
-                      {/* Vehicle Details */}
-                      <p className="text-white/70 text-lg font-light">
-                        {category.year} • {category.color}
-                      </p>
-                      
-                      {/* Capacity & Price */}
-                      <div className="flex items-center justify-center w-full" style={{ gap: 'var(--space-6)' }}>
-                        <div className="flex items-center text-base" style={{ gap: 'var(--space-2)' }}>
-                          <Users className="w-5 h-5 text-blue-400" />
-                          <span className="text-white/60">{category.passengers} pessoas</span>
-                        </div>
-                        <div className="font-bold text-xl">
-                          <span className="text-transparent bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200 bg-clip-text">
-                            ${category.dailyPrice}
-                          </span>
-                          <span className="text-blue-200/80 text-base font-light">/dia</span>
-                        </div>
-                      </div>
-                      
-                      {/* Features */}
-                      <div>
-                        <div className="text-white/50 text-xs font-medium tracking-[0.15em] uppercase" style={{ marginBottom: 'var(--space-2)' }}>
-                          Características
-                        </div>
-                        <div className="text-white/70 text-base font-light leading-relaxed">
-                          {category.features.slice(0, 3).join(' • ')}
-                          {category.features.length > 3 && (
-                            <span className="text-white/50"> • +{category.features.length - 3} mais</span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* CTA */}
-                      <motion.div 
-                        className="flex items-center text-amber-300 font-bold text-base cursor-pointer"
-                        style={{ gap: 'var(--space-3)', marginTop: 'var(--space-2)' }}
-                        whileHover={{ x: 8, scale: 1.05 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                      >
-                        <span className="tracking-wide">RESERVAR VEÍCULO</span>
-                        <ArrowRight className="w-5 h-5" />
                       </motion.div>
+                      
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        <h3 className="text-lg font-bold text-gray-900 leading-tight" style={{ marginBottom: '0.5rem' }}>
+                          {category.name.toUpperCase()}
+                        </h3>
+                        
+                        <p className="text-gray-500 text-xs font-light" style={{ marginBottom: '0.75rem' }}>
+                          Exemplo: {category.model} {category.year}
+                        </p>
+                        
+                        <div className="flex items-center text-xs text-gray-600" style={{ gap: 'var(--space-1)' }}>
+                          <Users className="w-3 h-3 text-blue-500" />
+                          <span>Até {category.passengers} pessoas</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                    
+                    {/* CTA Button */}
+                    <motion.div 
+                      className="flex items-center justify-center bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-white font-bold text-xs tracking-wide uppercase rounded-lg cursor-pointer transition-all duration-300"
+                      style={{ 
+                        padding: 'var(--space-2) var(--space-4)',
+                        gap: 'var(--space-2)'
+                      }}
+                      whileHover={{ 
+                        scale: 1.05,
+                        boxShadow: '0 8px 20px rgba(245,158,11,0.3)'
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <span>Fazer Reserva</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </motion.div>
+                  </motion.div>
                 </motion.article>
               ))}
             </motion.div>
@@ -865,7 +781,7 @@ export default function VehicleCategoriesSection() {
                     }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span className="relative z-10 font-black">FALAR COM ESPECIALISTA</span>
+                    <span className="relative z-10 font-black">FAZER RESERVA</span>
                     <ArrowRight className="w-6 h-6 relative z-10" />
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/25 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
                   </motion.button>

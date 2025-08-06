@@ -173,7 +173,7 @@ export default function TestimonialsSection() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              Mais de 10.000 brasileiros já viveram experiências incríveis em Orlando com nossos veículos premium.
+              Mais de 1.000 brasileiros já viveram experiências incríveis em Orlando com nossos veículos premium.
             </motion.p>
           </div>
         </motion.header>
@@ -330,7 +330,7 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
         >
           {[
-            { number: "10.000+", label: "Clientes Satisfeitos" },
+            { number: "1.000+", label: "Clientes Satisfeitos" },
             { number: "4.9", label: "Avaliação Média" },
             { number: "95%", label: "Indicariam para Amigos" }
           ].map((stat, index) => (
