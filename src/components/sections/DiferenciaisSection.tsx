@@ -3,14 +3,15 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { 
-  CreditCard, 
   Shield, 
   Car, 
   Users, 
   Plane, 
   Baby,
   CheckCircle,
-  ArrowRight
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { openWhatsAppDiferenciais } from '@/lib/whatsapp';
 
@@ -27,9 +28,7 @@ export default function DiferenciaisSection() {
   
   // Estado para controlar o slider
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   
   const diferenciais: DiferencialCard[] = [
@@ -63,36 +62,21 @@ export default function DiferenciaisSection() {
 
   // Slides para o mobile (todos os diferenciais)
   const mobileSlides = diferenciais;
-  const totalSlides = mobileSlides.length;
 
-  // Auto-play effect
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 4000); // Troca a cada 4 segundos
-
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, totalSlides]);
-
-  // Detectar mudança de scroll manual e manter sincronização
+  // Detectar mudança de scroll manual (simplificado)
   useEffect(() => {
     const container = sliderRef.current;
     if (!container) return;
 
     const handleScroll = () => {
-      if (isScrolling) return; // Ignora se estivermos fazendo scroll programático
+      if (isScrolling) return;
       
       const scrollLeft = container.scrollLeft;
-      const containerWidth = container.clientWidth;
       const cardWidth = 320;
       const gap = 24;
-      const padding = containerWidth / 2 - cardWidth / 2; // Padding dinâmico
       
-      // Calcular qual card está mais próximo do centro da tela
-      const adjustedScroll = scrollLeft + padding;
-      const approximateIndex = Math.round(adjustedScroll / (cardWidth + gap));
+      // Simples detecção de índice atual
+      const approximateIndex = Math.round(scrollLeft / (cardWidth + gap));
       const clampedIndex = Math.max(0, Math.min(approximateIndex, mobileSlides.length - 1));
       
       if (clampedIndex !== currentSlide) {
@@ -100,33 +84,26 @@ export default function DiferenciaisSection() {
       }
     };
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
+    // Debounce para evitar múltiplos triggers
+    let timeoutId: NodeJS.Timeout;
+    const debouncedScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleScroll, 100);
+    };
+
+    container.addEventListener('scroll', debouncedScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', debouncedScroll);
+      clearTimeout(timeoutId);
+    };
   }, [currentSlide, isScrolling, mobileSlides.length]);
 
-  // Garantir centralização em todas as situações
+  // Centralização inicial apenas
   useEffect(() => {
-    const ensureCentered = () => {
-      if (sliderRef.current) {
-        const newPosition = getScrollPosition(currentSlide);
-        sliderRef.current.scrollLeft = newPosition;
-      }
-    };
-
-    // Tentar centralizar imediatamente
-    ensureCentered();
-    
-    // Tentar novamente após um pequeno delay (para garantir que o DOM esteja pronto)
-    const timer1 = setTimeout(ensureCentered, 50);
-    const timer2 = setTimeout(ensureCentered, 150);
-    const timer3 = setTimeout(ensureCentered, 300);
-    
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
-  }, [currentSlide]); // Executa sempre que currentSlide mudar
+    if (sliderRef.current && currentSlide === 0) {
+      sliderRef.current.scrollLeft = 0;
+    }
+  }, []); // Apenas na montagem inicial
 
   // Reposicionar quando a tela mudar de tamanho
   useEffect(() => {
@@ -141,82 +118,47 @@ export default function DiferenciaisSection() {
     return () => window.removeEventListener('resize', handleResize);
   }, [currentSlide]);
 
-  // Scroll para o slide atual
-  useEffect(() => {
-    if (sliderRef.current) {
-      const slideWidth = 320; // largura do card
-      const gap = 24; // var(--space-4) = 24px
-      
-      // Calcula posição do slide
-      const scrollPosition = currentSlide * (slideWidth + gap);
-      
-      sliderRef.current.scrollTo({
-        left: scrollPosition,
-        behavior: 'smooth'
-      });
-    }
-  }, [currentSlide]);
-
   // Função para calcular a posição de scroll para centralizar um card
   const getScrollPosition = (index: number) => {
     if (!sliderRef.current) return 0;
     
-    const cardWidth = 320; // Largura fixa dos cards (clamp mínimo)
+    const cardWidth = 320; // Largura fixa dos cards
     const gap = 24; // var(--space-6) = 24px
     
     // Posição do card específico no scroll
     const cardPosition = index * (cardWidth + gap);
     
-    // A posição de scroll necessária para centralizar o card
-    const scrollPosition = cardPosition;
-    
-    return Math.max(0, scrollPosition);
+    return Math.max(0, cardPosition);
   };
 
-  // Navegar para um slide específico com transição suave
+  // Navegar para um slide específico (simplificado)
   const goToSlide = (index: number) => {
     if (isScrolling || !sliderRef.current) return;
     
     setIsScrolling(true);
-    setIsTransitioning(true);
-    setIsAutoPlaying(false); // Para o autoplay quando usuário interage
+    setCurrentSlide(index);
     
-    // Fade out suave
-    setTimeout(() => {
-      const scrollPosition = getScrollPosition(index);
-      
-      sliderRef.current?.scrollTo({
-        left: scrollPosition,
-        behavior: 'smooth'
-      });
-      
-      // Atualizar o estado durante a transição
-      setCurrentSlide(index);
-      
-      // Fade in após posicionamento
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 200);
-      
-    }, 100);
+    const scrollPosition = getScrollPosition(index);
+    sliderRef.current.scrollTo({
+      left: scrollPosition,
+      behavior: 'smooth'
+    });
     
-    // Reset scrolling flag after animation completa
-    setTimeout(() => setIsScrolling(false), 800);
-    
-    // Retoma autoplay após 8 segundos de inatividade
-    setTimeout(() => {
-      setIsAutoPlaying(true);
-    }, 8000);
+    // Reset scrolling flag
+    setTimeout(() => setIsScrolling(false), 300);
   };
 
-  // Pausar autoplay quando hover nos cards
-  const handleMouseEnter = () => {
-    setIsAutoPlaying(false);
+  // Navegar para próximo/anterior
+  const goToPrevious = () => {
+    const newIndex = currentSlide > 0 ? currentSlide - 1 : mobileSlides.length - 1;
+    goToSlide(newIndex);
   };
 
-  const handleMouseLeave = () => {
-    setIsAutoPlaying(true);
+  const goToNext = () => {
+    const newIndex = currentSlide < mobileSlides.length - 1 ? currentSlide + 1 : 0;
+    goToSlide(newIndex);
   };
+
 
   return (
     <section id="diferenciais" className="editorial-section bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
@@ -640,8 +582,6 @@ export default function DiferenciaisSection() {
             <motion.div 
               ref={sliderRef}
               className="lg:hidden overflow-x-auto scrollbar-hide snap-x snap-mandatory"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
               style={{
                 paddingTop: 'var(--space-4)',
                 paddingBottom: 'var(--space-4)',
@@ -649,7 +589,7 @@ export default function DiferenciaisSection() {
                 paddingRight: 'calc(50vw - 160px)'  // Centralizar último card
               }}
               animate={{
-                opacity: isTransitioning ? 0.8 : 1,
+                opacity: 1,
               }}
               transition={{
                 duration: 0.3,
@@ -779,15 +719,32 @@ export default function DiferenciaisSection() {
               </div>
             </motion.div>
             
-            {/* Mobile Slider Dots - Elegant Indicators */}
+            {/* Mobile Slider Dots - Simplified */}
             <motion.div 
-              className="lg:hidden flex justify-center"
-              style={{ marginTop: 'var(--space-6)' }}
+              className="lg:hidden flex justify-center items-center"
+              style={{ 
+                gap: 'var(--space-4)', 
+                marginTop: 'var(--space-6)',
+                padding: 'var(--space-4)'
+              }}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
             >
+              {/* Navigation Arrows */}
+              <motion.button
+                className="flex items-center text-black hover:text-black/80 transition-colors"
+                style={{ gap: 'var(--space-1)' }}
+                onClick={goToPrevious}
+                whileHover={{ x: -2, scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span className="text-xs font-medium">Anterior</span>
+              </motion.button>
+              
+              {/* Interactive Dots */}
               <div className="flex" style={{ gap: 'var(--space-2)' }}>
                 {mobileSlides.map((_, index) => (
                   <motion.button
@@ -797,23 +754,35 @@ export default function DiferenciaisSection() {
                       width: index === currentSlide ? '24px' : '8px',
                       height: '8px',
                       background: index === currentSlide 
-                        ? 'linear-gradient(135deg, #F59E0B, #FBBF24)' 
+                        ? 'linear-gradient(135deg, #0066CC, #3B82F6)' 
                         : 'rgba(156, 163, 175, 0.4)',
                       boxShadow: index === currentSlide 
-                        ? '0 4px 12px rgba(245,158,11,0.3)'
+                        ? '0 4px 12px rgba(0,102,204,0.4)'
                         : 'none'
                     }}
                     onClick={() => goToSlide(index)}
                     whileHover={{ 
                       scale: 1.2,
                       background: index === currentSlide 
-                        ? 'linear-gradient(135deg, #F59E0B, #FBBF24)' 
+                        ? 'linear-gradient(135deg, #0066CC, #3B82F6)' 
                         : 'rgba(156, 163, 175, 0.6)'
                     }}
                     whileTap={{ scale: 0.9 }}
                   />
                 ))}
               </div>
+              
+              {/* Navigation Arrows */}
+              <motion.button
+                className="flex items-center text-black hover:text-black/80 transition-colors"
+                style={{ gap: 'var(--space-1)' }}
+                onClick={goToNext}
+                whileHover={{ x: 2, scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-xs font-medium">Próximo</span>
+                <ChevronRight className="w-4 h-4" />
+              </motion.button>
             </motion.div>
           </div>
         </div>
