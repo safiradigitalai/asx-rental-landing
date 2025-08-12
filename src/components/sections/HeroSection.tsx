@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowRight, Star, ChevronDown } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import Logo from '@/components/ui/Logo';
 
 export default function HeroSection() {
@@ -160,7 +160,7 @@ export default function HeroSection() {
       >
         <div className="editorial-container" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)' }}>
           <div className="flex items-center justify-between">
-            <Logo size="lg" variant="light" />
+            <Logo size="md" variant="light" />
             
             <motion.button
               className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-blue-900 font-bold text-xs sm:text-sm tracking-[0.1em] uppercase transition-all duration-400 flex items-center cursor-pointer relative overflow-hidden shadow-2xl border border-amber-300/30"
@@ -226,7 +226,7 @@ export default function HeroSection() {
                     textShadow: '0 2px 8px rgba(0,0,0,0.3)',
                     letterSpacing: '0.01em',
                     fontWeight: '300',
-                    fontFamily: 'system-ui, -apple-system, serif',
+                    fontFamily: 'Inter, Helvetica Neue, system-ui, -apple-system, sans-serif',
                     marginBottom: 'var(--space-2)'
                   }}
                   initial={{ opacity: 0 }}

@@ -421,7 +421,7 @@ export default function TestimonialsSection() {
                   className="text-editorial-sm md:text-editorial-md leading-tight tracking-tighter" 
                   style={{ 
                     marginBottom: 'clamp(0.75rem, 2vw, var(--space-4))',
-                    fontFamily: 'ui-serif, Georgia, serif'
+                    fontFamily: 'Inter, Helvetica Neue, system-ui, -apple-system, sans-serif'
                   }}
                 >
                   PRONTO PARA CRIAR{' '}

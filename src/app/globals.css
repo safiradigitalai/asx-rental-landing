@@ -170,7 +170,7 @@ body {
   line-height: 1.1;
   font-weight: 900;
   letter-spacing: -0.04em;
-  font-family: ui-serif, Georgia, serif;
+  font-family: 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
 }
 
 .text-editorial-lg {
@@ -178,7 +178,7 @@ body {
   line-height: 0.9;
   font-weight: 800;
   letter-spacing: -0.03em;
-  font-family: ui-serif, Georgia, serif;
+  font-family: 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
 }
 
 .text-editorial-md {
@@ -186,7 +186,7 @@ body {
   line-height: 1;
   font-weight: 700;
   letter-spacing: -0.025em;
-  font-family: ui-serif, Georgia, serif;
+  font-family: 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
 }
 
 .text-editorial-sm {
@@ -194,7 +194,7 @@ body {
   line-height: 1.1;
   font-weight: 600;
   letter-spacing: -0.02em;
-  font-family: ui-serif, Georgia, serif;
+  font-family: 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
 }
 
 .text-display {
