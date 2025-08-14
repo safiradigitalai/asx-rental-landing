@@ -6,12 +6,7 @@ import VehicleCategoriesSection from '@/components/sections/VehicleCategoriesSec
 import PriceCalculatorSection from '@/components/sections/PriceCalculatorSection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
 import FooterSection from '@/components/sections/FooterSection';
-import LeadCaptureModal from '@/components/ui/LeadCaptureModal';
-import { useLeadModal } from '@/hooks/useLeadModal';
-
 export default function Home() {
-  const { isOpen, modalData, closeModal } = useLeadModal();
-
   return (
     <main className="min-h-screen">
       <HeroSection />
@@ -20,12 +15,6 @@ export default function Home() {
       <PriceCalculatorSection />
       <TestimonialsSection />
       <FooterSection />
-      
-      <LeadCaptureModal 
-        isOpen={isOpen}
-        onClose={closeModal}
-        initialData={modalData}
-      />
     </main>
   );
 }

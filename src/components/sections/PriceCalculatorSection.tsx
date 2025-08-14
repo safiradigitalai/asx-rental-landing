@@ -17,7 +17,7 @@ import {
   X
 } from 'lucide-react';
 import { differenceInDays, addDays, format } from 'date-fns';
-import { dailyPrices } from '@/lib/supabase';
+import { dailyPrices } from '@/lib/whatsapp';
 
 export default function PriceCalculatorSection() {
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof dailyPrices | ''>('');
@@ -341,7 +341,7 @@ export default function PriceCalculatorSection() {
       `*Cliente aguarda confirmação e próximos passos!* 📞`;
 
     const encodedMessage = encodeURIComponent(whatsappMessage);
-    const whatsappUrl = `https://wa.me/5584999194580?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/16893094332?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
     
     // Reset form and show success feedback
@@ -450,7 +450,7 @@ export default function PriceCalculatorSection() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              Reserve agora com total segurança. Pagamento só após receber as chaves, quilometragem ilimitada e suporte especializado em português.
+              Reserve agora com total segurança. Pagamento só após receber as chaves, milhas livres e suporte especializado em português.
             </motion.p>
 
           </div>

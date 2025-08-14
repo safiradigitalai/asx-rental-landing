@@ -17,7 +17,7 @@ Landing page premium para locadora de carros ASX Group em Orlando, desenvolvida 
 - **Tailwind CSS 3.4+**
 - **Framer Motion 11+** (Animações 60fps)
 - **Lucide React** (Ícones)
-- **Supabase** (Database + Real-time)
+- **WhatsApp Integration** (Direct messaging)
 - **React Hook Form + Zod** (Validação)
 
 ### 📱 Seções Implementadas
@@ -28,11 +28,11 @@ Landing page premium para locadora de carros ASX Group em Orlando, desenvolvida 
 
 ### 🎯 Funcionalidades
 - ✅ Cálculo automático de preços por diária
-- ✅ Integração WhatsApp para leads
+- ✅ Integração WhatsApp direta para leads
 - ✅ Animações suaves 60fps
 - ✅ Design glassmorphism premium
-- ✅ Formulários validados
-- ✅ Schema Supabase configurado
+- ✅ Mensagens personalizadas por seção
+- ✅ Sistema de reserva via WhatsApp
 
 ## 🛠️ Configuração
 
@@ -41,43 +41,12 @@ Landing page premium para locadora de carros ASX Group em Orlando, desenvolvida 
 npm install
 ```
 
-### 2. Variáveis de Ambiente
-Copie o arquivo `.env.example` para `.env.local` e configure:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=sua_url_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_supabase
-```
-
-### 3. Schema Supabase
-Execute o seguinte SQL no seu projeto Supabase:
-
-```sql
-CREATE TABLE leads (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  nome VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL, 
-  telefone VARCHAR(20) NOT NULL,
-  data_chegada DATE NOT NULL,
-  data_saida DATE NOT NULL,
-  categoria_veiculo VARCHAR(100) NOT NULL,
-  numero_passageiros INTEGER NOT NULL,
-  observacoes TEXT,
-  origem VARCHAR(50) NOT NULL,
-  preco_diaria DECIMAL(6,2) NOT NULL,
-  preco_total DECIMAL(8,2) NOT NULL,
-  dias_locacao INTEGER NOT NULL,
-  status VARCHAR(20) DEFAULT 'novo'
-);
-```
-
-### 4. Desenvolvimento
+### 2. Desenvolvimento
 ```bash
 npm run dev
 ```
 
-### 5. Build
+### 3. Build
 ```bash
 npm run build
 npm start
@@ -128,7 +97,6 @@ const dailyPrices = {
 ## 📱 Próximas Implementações
 - [ ] Seção Orlando Experience
 - [ ] Carousel de Depoimentos
-- [ ] Modal de Captação de Leads
 - [ ] Footer Premium
 - [ ] Otimizações de Performance
 - [ ] Testes Responsivos

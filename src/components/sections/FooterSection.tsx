@@ -8,7 +8,6 @@ import {
 import Logo from '@/components/ui/Logo';
 
 export default function FooterSection() {
-  const currentYear = new Date().getFullYear();
 
   const scrollToSection = (href: string) => {
     if (href.startsWith('#')) {
@@ -58,7 +57,9 @@ export default function FooterSection() {
           >
             {/* Logo */}
             <div style={{ marginBottom: 'var(--space-3)' }}>
-              <Logo size="lg" variant="light" />
+              <div className="inline-block p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
+                <Logo size="lg" variant="light" />
+              </div>
             </div>
             
             {/* Elegant Tagline */}
@@ -134,7 +135,7 @@ export default function FooterSection() {
           <div className="col-span-12">
             <div className="flex flex-col lg:flex-row items-center justify-between" style={{ gap: 'var(--space-4)' }}>
               <div className="text-blue-100/60 text-sm font-light">
-                © {currentYear} ASX Group Rental Cars. Todos os direitos reservados.
+                © 2025 Empresa do grupo ASX USA LLC
               </div>
               
               <div className="text-blue-100/60 text-sm font-light">

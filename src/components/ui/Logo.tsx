@@ -10,12 +10,7 @@ interface LogoProps {
   whiteFilter?: boolean;
 }
 
-export default function Logo({ className = '', size = 'md', variant = 'light', whiteFilter = false }: LogoProps) {
-  const sizeClasses = {
-    sm: 'h-8',
-    md: 'h-10', 
-    lg: 'h-12'
-  };
+export default function Logo({ className = '', size = 'md', whiteFilter = false }: LogoProps) {
 
   const imageSize = {
     sm: { width: 120, height: 120 },

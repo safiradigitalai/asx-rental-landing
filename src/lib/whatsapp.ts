@@ -1,7 +1,28 @@
 import { format, differenceInDays } from 'date-fns';
-import { LeadCapture, dailyPrices } from './supabase';
 
-export const WHATSAPP_NUMBER = '5584999194580';
+// Tipos locais para WhatsApp (sem Supabase)
+export interface LeadCapture {
+  nome: string;
+  email: string;
+  telefone: string;
+  dataChegada: Date;
+  dataSaida: Date;
+  categoriaVeiculo: 'Sedan' | 'Minivan Regular' | 'Minivan Luxo' | 'Esportivo' | 'SUV' | 'SUV Luxo';
+  numeroPassageiros: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  observacoes?: string;
+  origem: 'hero' | 'categoria' | 'calculadora' | 'turismo' | 'footer';
+}
+
+export const dailyPrices = {
+  'Sedan': 44.99,
+  'Minivan Regular': 54.99,
+  'Minivan Luxo': 64.99,
+  'Esportivo': 49.99,
+  'SUV': 54.99,
+  'SUV Luxo': 149.90
+} as const;
+
+export const WHATSAPP_NUMBER = '16893094332';
 export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 export const formatWhatsAppMessage = (lead: LeadCapture) => {

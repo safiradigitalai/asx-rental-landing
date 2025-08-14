@@ -72,7 +72,7 @@ export default function VehicleCategoriesSection() {
       passengers: 5,
       priceRange: '$45-65/dia',
       dailyPrice: 44.99,
-      imageUrl: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/41138/elantra-exterior-right-front-three-quarter.jpeg?q=80',
+      imageUrl: 'https://cdn.jdpower.com/JDPA_2020%20Hyundai%20Elantra%20Sport%20Blue%20Front%20View.jpg',
       features: ['Econômico', 'Ar Condicionado', 'Direção Elétrica', 'Bluetooth']
     },
     {
@@ -221,7 +221,7 @@ export default function VehicleCategoriesSection() {
     if (scrollRef.current && currentSlide === 0) {
       scrollRef.current.scrollLeft = 0;
     }
-  }, []); // Apenas na montagem inicial
+  }, [currentSlide]); // Inclui currentSlide como dependência
 
   // Reposicionar quando a tela mudar de tamanho
   useEffect(() => {
@@ -317,7 +317,7 @@ export default function VehicleCategoriesSection() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              Diferentes categorias para cada necessidade. Econômicos para cidade, familiares espaçosos, esportivos e SUVs. Todos com seguro completo e quilometragem ilimitada.
+              Diferentes categorias para cada necessidade. Econômicos para cidade, familiares espaçosos, esportivos e SUVs. Todos com seguro completo e milhas livres.
             </motion.p>
             </div>
           </div>

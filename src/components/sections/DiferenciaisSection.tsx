@@ -103,7 +103,7 @@ export default function DiferenciaisSection() {
     if (sliderRef.current && currentSlide === 0) {
       sliderRef.current.scrollLeft = 0;
     }
-  }, []); // Apenas na montagem inicial
+  }, [currentSlide]); // Inclui currentSlide como dependência
 
   // Reposicionar quando a tela mudar de tamanho
   useEffect(() => {
