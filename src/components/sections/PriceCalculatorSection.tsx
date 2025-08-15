@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calendar, 
@@ -19,6 +19,121 @@ import {
 import { differenceInDays, addDays, format } from 'date-fns';
 import { dailyPrices } from '@/lib/whatsapp';
 
+// Enhanced validation functions for production - more restrictive
+const validateEmail = (email: string): boolean => {
+  const trimmedEmail = email.trim().toLowerCase();
+  
+  // Basic format check
+  const basicEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!basicEmailRegex.test(trimmedEmail)) return false;
+  
+  // Additional checks for production safety
+  const parts = trimmedEmail.split('@');
+  if (parts.length !== 2) return false;
+  
+  const [localPart, domainPart] = parts;
+  
+  // Local part validation (before @)
+  if (localPart.length < 1 || localPart.length > 64) return false;
+  if (localPart.startsWith('.') || localPart.endsWith('.')) return false;
+  if (localPart.includes('..')) return false;
+  
+  // Domain part validation (after @)
+  if (domainPart.length < 4 || domainPart.length > 255) return false; // min: a.co
+  if (domainPart.startsWith('.') || domainPart.endsWith('.')) return false;
+  if (domainPart.includes('..')) return false;
+  
+  // Must have at least one dot in domain and valid TLD
+  const domainParts = domainPart.split('.');
+  if (domainParts.length < 2) return false;
+  
+  const tld = domainParts[domainParts.length - 1];
+  if (tld.length < 2 || tld.length > 10) return false;
+  
+  // Common domain validation
+  return /^[a-zA-Z0-9.-]+$/.test(domainPart) && !/[.-]{2,}/.test(domainPart);
+};
+
+const validatePhone = (phone: string): boolean => {
+  const cleanPhone = phone.replace(/\D/g, '');
+  
+  // More specific phone validation
+  if (cleanPhone.length < 10 || cleanPhone.length > 15) return false;
+  
+  // Brazilian phone patterns (more specific)
+  if (cleanPhone.length === 11) {
+    // DDD + 9 + 8 digits (Brazilian mobile)
+    const ddd = cleanPhone.substring(0, 2);
+    const firstDigit = cleanPhone.substring(2, 3);
+    
+    // Valid Brazilian area codes (DDDs)
+    const validDDDs = ['11', '12', '13', '14', '15', '16', '17', '18', '19', // SP
+                      '21', '22', '24', // RJ
+                      '27', '28', // ES
+                      '31', '32', '33', '34', '35', '37', '38', // MG
+                      '41', '42', '43', '44', '45', '46', // PR
+                      '47', '48', '49', // SC
+                      '51', '53', '54', '55', // RS
+                      '61', // DF
+                      '62', '64', // GO
+                      '63', // TO
+                      '65', '66', // MT
+                      '67', // MS
+                      '68', // AC
+                      '69', // RO
+                      '71', '73', '74', '75', '77', // BA
+                      '79', // SE
+                      '81', '87', // PE
+                      '82', // AL
+                      '83', // PB
+                      '84', // RN
+                      '85', '88', // CE
+                      '86', '89', // PI
+                      '91', '93', '94', // PA
+                      '92', '97', // AM
+                      '95', // RR
+                      '96', // AP
+                      '98', '99']; // MA
+    
+    return validDDDs.includes(ddd) && (firstDigit === '9' || firstDigit === '8' || firstDigit === '7');
+  }
+  
+  // International phones (10-15 digits)
+  if (cleanPhone.length >= 10 && cleanPhone.length <= 15) {
+    // Should not start with 0
+    return !cleanPhone.startsWith('0');
+  }
+  
+  return false;
+};
+
+const validateName = (name: string): boolean => {
+  const trimmedName = name.trim();
+  
+  // Basic length check - minimum 3 characters for single name
+  if (trimmedName.length < 3 || trimmedName.length > 50) return false;
+  
+  // Only letters, accents, spaces, hyphens, apostrophes
+  const nameRegex = /^[a-zA-ZÀ-ÿ\s'.-]+$/;
+  if (!nameRegex.test(trimmedName)) return false;
+  
+  // Cannot start or end with special characters
+  if (/^[^a-zA-ZÀ-ÿ]|[^a-zA-ZÀ-ÿ]$/.test(trimmedName)) return false;
+  
+  // No consecutive spaces or special characters
+  if (/\s{2,}|[.']{2,}|[-]{2,}/.test(trimmedName)) return false;
+  
+  // If has multiple parts, each part must be at least 2 characters
+  const nameParts = trimmedName.split(/\s+/).filter(part => part.length > 0);
+  if (nameParts.length > 1 && nameParts.some(part => part.length < 2)) return false;
+  
+  return true;
+};
+
+const sanitizeInput = (input: string): string => {
+  return input.trim().replace(/[<>]/g, '');
+};
+
 export default function PriceCalculatorSection() {
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof dailyPrices | ''>('');
   const [checkInDate, setCheckInDate] = useState('');
@@ -36,6 +151,7 @@ export default function PriceCalculatorSection() {
   const [carSeatQuantity, setCarSeatQuantity] = useState(1);
   const [modalStep, setModalStep] = useState(1); // 1: Summary, 2: Client Data
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Quick date suggestions
   const quickDateOptions = [
@@ -269,14 +385,58 @@ export default function PriceCalculatorSection() {
     setTimeout(scrollToFormStart, 100);
   };
 
-  // Validate client data
-  const validateClientData = () => {
-    return clientName.trim() && clientEmail.trim() && clientPhone.trim();
-  };
+  // Validate client data without changing state (pure function)
+  const isClientDataValid = useCallback(() => {
+    const name = sanitizeInput(clientName);
+    const email = sanitizeInput(clientEmail);
+    const phone = sanitizeInput(clientPhone);
+
+    return validateName(name) && validateEmail(email) && validatePhone(phone);
+  }, [clientName, clientEmail, clientPhone]);
+
+  // Get validation errors without changing state
+  const getValidationErrors = useCallback(() => {
+    const errors: string[] = [];
+    const name = sanitizeInput(clientName);
+    const email = sanitizeInput(clientEmail);
+    const phone = sanitizeInput(clientPhone);
+
+    if (!name) {
+      errors.push('Nome é obrigatório');
+    } else if (!validateName(name)) {
+      errors.push('Nome deve ter pelo menos 3 letras, apenas caracteres válidos (ex: João ou João Silva)');
+    }
+
+    if (!email) {
+      errors.push('E-mail é obrigatório');
+    } else if (!validateEmail(email)) {
+      errors.push('E-mail deve ser completo e válido (ex: joao.silva@gmail.com)');
+    }
+
+    if (!phone) {
+      errors.push('WhatsApp é obrigatório');
+    } else if (!validatePhone(phone)) {
+      errors.push('WhatsApp deve ser um número válido brasileiro (ex: (11) 99999-9999) ou internacional');
+    }
+
+    return errors;
+  }, [clientName, clientEmail, clientPhone]);
+
+  // Validate and set errors (only called on user action)
+  const validateAndShowErrors = useCallback(() => {
+    const errors = getValidationErrors();
+    setValidationErrors(errors);
+    return errors.length === 0;
+  }, [getValidationErrors]);
 
   // Send to WhatsApp with complete data
   const sendToWhatsApp = () => {
-    if (!validateClientData()) return;
+    if (!validateAndShowErrors()) return;
+
+    // Use sanitized data for WhatsApp message
+    const sanitizedName = sanitizeInput(clientName);
+    const sanitizedEmail = sanitizeInput(clientEmail);
+    const sanitizedPhone = sanitizeInput(clientPhone);
 
     const checkInFormatted = new Date(checkInDate + 'T12:00:00').toLocaleDateString('pt-BR', {
       weekday: 'long',
@@ -305,9 +465,9 @@ export default function PriceCalculatorSection() {
     const whatsappMessage = `🚗 *NOVA RESERVA ASX RENTAL*\n` +
       `══════════════════════════════════════\n\n` +
       `👤 *DADOS DO CLIENTE*\n` +
-      `• Nome: ${clientName}\n` +
-      `• WhatsApp: ${clientPhone}\n` +
-      `• Email: ${clientEmail}\n\n` +
+      `• Nome: ${sanitizedName}\n` +
+      `• WhatsApp: ${sanitizedPhone}\n` +
+      `• Email: ${sanitizedEmail}\n\n` +
       `🚙 *DETALHES DA RESERVA*\n` +
       `• Veículo: ${selectedCategory ? (categoryDetails[selectedCategory as keyof typeof categoryDetails] || selectedCategory) : 'Não selecionado'}\n` +
       `• Passageiros: ${passengers} ${passengers === 1 ? 'pessoa' : 'pessoas'}\n` +
@@ -352,6 +512,7 @@ export default function PriceCalculatorSection() {
     setClientPhone('');
     setNeedsCarSeat(false);
     setCarSeatQuantity(1);
+    setValidationErrors([]);
     
     // Show success toast
     setTimeout(() => {
@@ -1364,9 +1525,9 @@ export default function PriceCalculatorSection() {
                             
                             <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
                               {[
-                                { label: 'À Vista', value: total.toFixed(2), desc: '5% desconto', color: 'emerald' },
-                                { label: '3x sem juros', value: (total / 3).toFixed(2), desc: 'por parcela', color: 'amber' },
-                                { label: '6x sem juros', value: (total / 6).toFixed(2), desc: 'por parcela', color: 'blue' }
+                                { label: 'À Vista', value: total.toFixed(2), desc: '', color: 'emerald' },
+                                { label: '3x parcelado', value: (total / 3).toFixed(2), desc: '', color: 'amber' },
+                                { label: '6x parcelado', value: (total / 6).toFixed(2), desc: '', color: 'blue' }
                               ].map((option, index) => (
                                 <motion.div 
                                   key={index}
@@ -1813,6 +1974,20 @@ export default function PriceCalculatorSection() {
                                 />
                               </div>
                             ))}
+
+                            {/* Validation Errors Display */}
+                            {validationErrors.length > 0 && (
+                              <div className="bg-red-500/10 border border-red-400/25 rounded-lg p-4 mt-4">
+                                <h4 className="text-red-200 font-semibold text-sm mb-2">
+                                  ⚠️ Corrija os erros abaixo:
+                                </h4>
+                                <ul className="text-red-200/80 text-sm space-y-1">
+                                  {validationErrors.map((error, index) => (
+                                    <li key={index}>• {error}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                             
                             {/* Car Seat Section */}
                             <div className="editorial-stack-sm">
@@ -2061,9 +2236,9 @@ export default function PriceCalculatorSection() {
                     {/* Primary CTA Button */}
                     <motion.button
                       onClick={modalStep === 1 ? proceedToClientData : sendToWhatsApp}
-                      disabled={modalStep === 2 && !validateClientData()}
+                      disabled={modalStep === 2 && !isClientDataValid()}
                       className={`group relative font-bold tracking-wide uppercase overflow-hidden transition-all duration-400 flex items-center justify-center cursor-pointer flex-1 ${
-                        modalStep === 2 && !validateClientData()
+                        modalStep === 2 && !isClientDataValid()
                           ? 'bg-gray-700 border border-gray-600 text-gray-400 cursor-not-allowed'
                           : 'bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-400 hover:from-emerald-500 hover:via-emerald-400 hover:to-emerald-300 text-white shadow-lg shadow-emerald-500/25'
                       }`}
@@ -2075,13 +2250,13 @@ export default function PriceCalculatorSection() {
                         gap: 'clamp(0.5rem, 2vw, 0.75rem)',
                         minHeight: 'clamp(50px, 14vw, 64px)'
                       }}
-                      whileHover={modalStep === 2 && !validateClientData() ? {} : { 
+                      whileHover={modalStep === 2 && !isClientDataValid() ? {} : { 
                         scale: 1.02,
                         y: -2,
                         boxShadow: '0 12px 40px rgba(16, 185, 129, 0.4)',
                         transition: { type: 'spring', stiffness: 400, damping: 17 }
                       }}
-                      whileTap={modalStep === 2 && !validateClientData() ? {} : { scale: 0.98 }}
+                      whileTap={modalStep === 2 && !isClientDataValid() ? {} : { scale: 0.98 }}
                     >
                       {modalStep === 1 ? (
                         <>
@@ -2094,7 +2269,7 @@ export default function PriceCalculatorSection() {
                           <span className="relative z-10 font-black">Finalizar no WhatsApp</span>
                         </>
                       )}
-                      {!(modalStep === 2 && !validateClientData()) && (
+                      {!(modalStep === 2 && !isClientDataValid()) && (
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-800" />
                       )}
                     </motion.button>
