@@ -437,7 +437,7 @@ export default function VehicleCategoriesSection() {
                   }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <span>Fazer Reserva</span>
+                  <span>Fazer Cotação</span>
                   <ArrowRight className="w-4 h-4" />
                 </motion.button>
               </div>
@@ -586,7 +586,7 @@ export default function VehicleCategoriesSection() {
                       }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span>Fazer Reserva</span>
+                      <span>Cotação</span>
                       <ArrowRight className="w-3 h-3" />
                     </motion.div>
                   </motion.div>

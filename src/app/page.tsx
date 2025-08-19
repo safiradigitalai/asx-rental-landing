@@ -1,7 +1,6 @@
 'use client';
 
 import HeroSection from '@/components/sections/HeroSection';
-import DiferenciaisSection from '@/components/sections/DiferenciaisSection';
 import VehicleCategoriesSection from '@/components/sections/VehicleCategoriesSection';
 import PriceCalculatorSection from '@/components/sections/PriceCalculatorSection';
 import TestimonialsSection from '@/components/sections/TestimonialsSection';
@@ -10,7 +9,6 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <HeroSection />
-      <DiferenciaisSection />
       <VehicleCategoriesSection />
       <PriceCalculatorSection />
       <TestimonialsSection />

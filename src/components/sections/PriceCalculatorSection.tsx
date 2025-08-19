@@ -586,7 +586,7 @@ export default function PriceCalculatorSection() {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <Calculator className="w-4 h-4" />
-              <span>Reserva já ASX</span>
+              <span>Cotação ASX</span>
             </motion.div>
             
             {/* Editorial Headline */}
@@ -1525,9 +1525,9 @@ export default function PriceCalculatorSection() {
                             
                             <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
                               {[
-                                { label: 'À Vista', value: total.toFixed(2), desc: '', color: 'emerald' },
-                                { label: '3x parcelado', value: (total / 3).toFixed(2), desc: '', color: 'amber' },
-                                { label: '6x parcelado', value: (total / 6).toFixed(2), desc: '', color: 'blue' }
+                                { label: 'PIX', value: total.toFixed(2), desc: '', color: 'emerald' },
+                                { label: 'CARTÃO À VISTA', value: total.toFixed(2), desc: '', color: 'amber' },
+                                { label: 'CARTÃO PARCELADO', value: (total / 18).toFixed(2), desc: 'em até 18x com juros', color: 'blue' }
                               ].map((option, index) => (
                                 <motion.div 
                                   key={index}

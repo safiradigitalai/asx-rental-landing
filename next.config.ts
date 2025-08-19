@@ -2,11 +2,43 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'export',
-  trailingSlash: true,
+  trailingSlash: false,
   images: {
     unoptimized: true,
-    domains: ['images.unsplash.com', 'moparinsiders.com', 'upload.wikimedia.org', 'hips.hearstapps.com', 'imgd.aeplcdn.com', 'cdn.motor1.com'],
-    formats: ['image/webp', 'image/avif'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'moparinsiders.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'hips.hearstapps.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'imgd.aeplcdn.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.motor1.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.jdpower.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pictures.dealer.com',
+      }
+    ],
   }
 };
 

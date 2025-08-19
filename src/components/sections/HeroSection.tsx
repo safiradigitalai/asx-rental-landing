@@ -179,8 +179,8 @@ export default function HeroSection() {
               }}
               whileTap={{ scale: 0.98 }}
             >
-              <span className="hidden sm:inline relative z-10 font-black">Faça sua Reserva</span>
-              <span className="sm:hidden relative z-10 font-black">Reservar</span>
+              <span className="hidden sm:inline relative z-10 font-black">Fazer Cotação</span>
+              <span className="sm:hidden relative z-10 font-black">Cotação</span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-600" />
             </motion.button>
           </div>
@@ -292,7 +292,7 @@ export default function HeroSection() {
                     }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <span>Fazer Reserva</span>
+                    <span>Fazer Cotação</span>
                   </motion.button>
                 </motion.div>
               </motion.div>
